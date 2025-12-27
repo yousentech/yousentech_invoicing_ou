@@ -8,7 +8,7 @@
             <xpath expr="//notebook/page[@name='access_rights']/group" position="after">
                 <group string="Operation Unit Settings">
                     <field name="default_ou_id" required="1"/>
-                    <field name="allowed_ou_ids"/>
+                    <field name="allowed_ou_ids" widgets="many2many_tags"/>
                 </group>
             </xpath>
         </field>
