@@ -40,28 +40,51 @@ class StockPicking(models.Model):
                     'Operation Unit is required'
                 )
 
+    @api.constrains('operation_unit_id', 'company_id')
+    def _check_picking_ou_validity(self):
+        for picking in self:
+            ou = picking.operation_unit_id
+            user = self.env.user
+
+            if not ou:
+                raise ValidationError("Operation Unit is required on this document.")
+
+            if ou.company_id != picking.company_id:
+                raise ValidationError(
+                    "The selected Operation Unit does not belong to the same company as this document."
+                )
+
+            if user.allowed_ou_ids and ou not in user.allowed_ou_ids:
+                raise ValidationError(
+                    "The selected Operation Unit is not allowed for the current user."
+                )
 
 class StockMove(models.Model):
-    _inherit = 'stock.move'
+    _inherit = ['stock.move', 'operation.unit.mixin', 'operation.unit.constraints.mixin']
 
  
     def _prepare_account_move_vals(self):
-        vals = super()._prepare_account_move_vals()
+        # vals = super()._prepare_account_move_vals()
 
-        ou = False
+        # ou = False
  
-        if self.stock_valuation_layer_ids:
-            ou = self.stock_valuation_layer_ids[0].operation_unit_id
+        # if self.stock_valuation_layer_ids:
+        #     ou = self.stock_valuation_layer_ids[0].operation_unit_id
  
-        if not ou and self.picking_id and self.picking_id.operation_unit_id:
-            ou = self.picking_id.operation_unit_id
+        # if not ou and self.picking_id and self.picking_id.operation_unit_id:
+        #     ou = self.picking_id.operation_unit_id
  
-        if not ou:
-            ou = self.env.user.default_ou_id
+        # if not ou:
+        #     ou = self.env.user.default_ou_id
  
+        # if ou:
+        #     vals['operation_unit_id'] = ou.id
+
+        # return vals
+        vals = super()._prepare_account_move_vals()
+        ou = self._get_operation_unit_from_source()
         if ou:
             vals['operation_unit_id'] = ou.id
-
         return vals
 
 

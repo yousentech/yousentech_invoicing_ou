@@ -8,5 +8,9 @@ class OperationUnit(models.Model):
     _description = 'Operation Unit'
  
     name = fields.Char(required=True)
-
+    company_id = fields.Many2one(
+        'res.company',
+        required=True,
+        default=lambda self: self.env.company
+    )
     active = fields.Boolean(default=True)
