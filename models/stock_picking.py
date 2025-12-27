@@ -60,32 +60,32 @@ class StockPicking(models.Model):
                 )
 
 class StockMove(models.Model):
-    _inherit = ['stock.move', 'operation.unit.mixin', 'operation.unit.constraints.mixin']
+    _inherit = 'stock.move' 
 
  
     def _prepare_account_move_vals(self):
-        # vals = super()._prepare_account_move_vals()
-
-        # ou = False
- 
-        # if self.stock_valuation_layer_ids:
-        #     ou = self.stock_valuation_layer_ids[0].operation_unit_id
- 
-        # if not ou and self.picking_id and self.picking_id.operation_unit_id:
-        #     ou = self.picking_id.operation_unit_id
- 
-        # if not ou:
-        #     ou = self.env.user.default_ou_id
- 
-        # if ou:
-        #     vals['operation_unit_id'] = ou.id
-
-        # return vals
         vals = super()._prepare_account_move_vals()
-        ou = self._get_operation_unit_from_source()
+
+        ou = False
+ 
+        if self.stock_valuation_layer_ids:
+            ou = self.stock_valuation_layer_ids[0].operation_unit_id
+ 
+        if not ou and self.picking_id and self.picking_id.operation_unit_id:
+            ou = self.picking_id.operation_unit_id
+ 
+        if not ou:
+            ou = self.env.user.default_ou_id
+ 
         if ou:
             vals['operation_unit_id'] = ou.id
+
         return vals
+        # vals = super()._prepare_account_move_vals()
+        # ou = self._get_operation_unit_from_source()
+        # if ou:
+        #     vals['operation_unit_id'] = ou.id
+        # return vals
 
 
 
