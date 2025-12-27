@@ -4,7 +4,7 @@ from odoo.exceptions import ValidationError
 from datetime import datetime
 
 class PurchaseOrder(models.Model):
-    _inherit = ['purchase.order', 'operation.unit.mixin', 'operation.unit.constraints.mixin']
+    _inherit = 'purchase.order' 
 
     operation_unit_id = fields.Many2one(
         'operation.unit',
