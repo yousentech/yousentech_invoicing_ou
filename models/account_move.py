@@ -4,7 +4,7 @@ from odoo.exceptions import ValidationError
 from datetime import datetime
  
 class AccountMove(models.Model):
-    _inherit = ['account.move',  'operation.unit.constraints.mixin']
+    _inherit ='account.move'
 
     operation_unit_id = fields.Many2one(
         'operation.unit',
@@ -13,30 +13,30 @@ class AccountMove(models.Model):
 
     @api.model
     def create(self, vals):
-        # move = super().create(vals)
-
-        # if not move.operation_unit_id:
- 
-        #     sale_lines = move.invoice_line_ids.mapped('sale_line_ids')
-        #     if sale_lines:
-        #         move.operation_unit_id = sale_lines[0].order_id.operation_unit_id.id
-        #         return move
- 
-        #     purchase_lines = move.invoice_line_ids.mapped('purchase_line_id')
-        #     if purchase_lines:
-        #         move.operation_unit_id = purchase_lines[0].order_id.operation_unit_id.id
-        #         return move
- 
-        #     move.operation_unit_id = self.env.user.default_ou_id.id
-
-        # return move
-
         move = super().create(vals)
+
         if not move.operation_unit_id:
-            ou = move._get_operation_unit_from_source()
-            if ou:
-                move.operation_unit_id = ou.id
+ 
+            sale_lines = move.invoice_line_ids.mapped('sale_line_ids')
+            if sale_lines:
+                move.operation_unit_id = sale_lines[0].order_id.operation_unit_id.id
+                return move
+ 
+            purchase_lines = move.invoice_line_ids.mapped('purchase_line_id')
+            if purchase_lines:
+                move.operation_unit_id = purchase_lines[0].order_id.operation_unit_id.id
+                return move
+ 
+            move.operation_unit_id = self.env.user.default_ou_id.id
+
         return move
+
+        # move = super().create(vals)
+        # if not move.operation_unit_id:
+        #     ou = move._get_operation_unit_from_source()
+        #     if ou:
+        #         move.operation_unit_id = ou.id
+        # return move
    
     @api.constrains('invoice_line_ids')
     def _check_single_ou(self):
