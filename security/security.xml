@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+         <record id="group_exceed_zatca_validation" model="res.groups">
+			<field name="name"> تجاوز التحقق  للفوتره الالكترونية</field>
+		</record>
+         
+
+    </data>
+</odoo>
