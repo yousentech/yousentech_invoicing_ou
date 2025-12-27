@@ -4,7 +4,7 @@ from odoo.exceptions import ValidationError
 from datetime import datetime
  
 class AccountMove(models.Model):
-    _inherit = ['account.move', 'operation.unit.mixin', 'operation.unit.constraints.mixin']
+    _inherit = ['account.move',  'operation.unit.constraints.mixin']
 
     operation_unit_id = fields.Many2one(
         'operation.unit',
