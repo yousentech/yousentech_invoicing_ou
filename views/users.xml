@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_users_form_ou" model="ir.ui.view">
+        <field name="name">res.users.form.ou</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@string='Preferences']" position="inside">
+                <group string="Operation Unit Settings">
+                    <field name="default_ou_id" required="1"/>
+                    <field name="allowed_ou_ids"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

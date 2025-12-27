@@ -20,10 +20,14 @@
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'security/security.xml',
       
-        # 'views/account_move.xml',
+        'views/operation_unit_views.xml',
+        'views/users.xml',
+        'views/views.xml',
+ 
+
 	#'wizards/recap.xml',
     ],
     # only loaded in demonstration mode
