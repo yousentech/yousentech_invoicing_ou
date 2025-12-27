@@ -9,7 +9,7 @@ class ResUsers(models.Model):
     default_ou_id = fields.Many2one(
         'operation.unit',
         string='Default Operation Unit',
-        domain="[('id', 'in', allowed_ou_ids)]"
+        domain="[('id', 'in', allowed_ou_ids)]",
         required=True,
     )
 
