@@ -106,7 +106,7 @@ class AccountMove(models.Model):
 
 
 class AccountMoveLine(models.Model):
-    _inherit = ['account.move.line', 'operation.unit.mixin', 'operation.unit.constraints.mixin']
+    _inherit = 'account.move.line' 
 
     operation_unit_id = fields.Many2one(
         'operation.unit',
@@ -121,26 +121,20 @@ class AccountMoveLine(models.Model):
                 raise ValidationError(
                     'Operation Unit is required on journal items.'
                 )
-    # @api.model
-    # def create(self, vals):
-
-    #     if not vals.get('operation_unit_id'):
-    #         if vals.get('move_id'):
-    #             move = self.env['account.move'].browse(vals['move_id'])
-    #             if move.operation_unit_id:
-    #                 vals['operation_unit_id'] = move.operation_unit_id.id
-
-    #     # if not vals.get('operation_unit_id'):
-    #     #     vals['operation_unit_id'] = self.env.user.default_ou_id.id
-
-    #     return super().create(vals)
     @api.model
     def create(self, vals):
-        if not vals.get('operation_unit_id') and vals.get('move_id'):
-            move = self.env['account.move'].browse(vals['move_id'])
-            vals['operation_unit_id'] = move._get_operation_unit_from_source().id
+
+        if not vals.get('operation_unit_id'):
+            if vals.get('move_id'):
+                move = self.env['account.move'].browse(vals['move_id'])
+                if move.operation_unit_id:
+                    vals['operation_unit_id'] = move.operation_unit_id.id
+
+        # if not vals.get('operation_unit_id'):
+        #     vals['operation_unit_id'] = self.env.user.default_ou_id.id
+
         return super().create(vals)
- 
+    
     def reconcile(self):
         ous = self.mapped('operation_unit_id').filtered(lambda x: x)
         if len(ous) > 1:
