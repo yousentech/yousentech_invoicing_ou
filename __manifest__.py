@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'yousentech_invoicing_ou',
-	'version': '13.0.1.0.0',
+	'version': '17.0.1.0.0',
 	'summary': 'yousentech_invoicing_ou',
 	'category': 'Tools',
 	'author': 'Developers team',
@@ -16,7 +16,7 @@
    
 
     # any module necessary for this one to work correctly
-    'depends': ['base','account','account_edi'],
+    'depends': ['base','account','purchase','sale','stock'],
 
     # always loaded
     'data': [
