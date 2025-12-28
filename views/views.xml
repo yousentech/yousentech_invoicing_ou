@@ -7,7 +7,7 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='partner_id']" position="after">
+            <xpath expr="//field[@name='company_id']" position="after">
                 <field name="operation_unit_id" readonly="1"/>
             </xpath>
         </field>
@@ -19,7 +19,7 @@
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.purchase_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='partner_id']" position="after">
+            <xpath expr="//field[@name='company_id']" position="after">
                 <field name="operation_unit_id"   readonly="1"/>
             </xpath>
         </field>
@@ -31,7 +31,7 @@
         <field name="model">stock.picking</field>
         <field name="inherit_id" ref="stock.view_picking_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='location_id']" position="before">
+            <xpath expr="//field[@name='company_id']" position="before">
                 <field name="operation_unit_id"   readonly="1"/>
             </xpath>
         </field>
@@ -43,7 +43,7 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='partner_id']" position="after">
+            <xpath expr="//field[@name='company_id']" position="after">
                 <field name="operation_unit_id"  readonly="1"/>
             </xpath>
         </field>
@@ -55,7 +55,7 @@
         <field name="model">account.move.line</field>
         <field name="inherit_id" ref="account.view_move_line_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='account_id']" position="after">
+            <xpath expr="//field[@name='company_id']" position="after">
                 <field name="operation_unit_id"   readonly="1"/>
             </xpath>
         </field>
@@ -67,7 +67,7 @@
         <field name="model">account.payment</field>
         <field name="inherit_id" ref="account.view_account_payment_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='journal_id']" position="after">
+            <xpath expr="//field[@name='company_id']" position="after">
                 <field name="operation_unit_id"   readonly="1"/>
             </xpath>
         </field>

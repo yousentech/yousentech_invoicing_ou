@@ -48,8 +48,19 @@ class StockPicking(models.Model):
                 raise ValidationError(
                     "The selected Operation Unit is not allowed for the current user."
                 )
+           
+            picking._assign_ou_to_moves()
 
         return super().button_validate()
+
+
+    def _assign_ou_to_moves(self):
+        for picking in self:
+            if picking.operation_unit_id:
+                picking.move_lines.write({
+                    'operation_unit_id': picking.operation_unit_id.id
+                })
+
  
 class StockMove(models.Model):
     _inherit = 'stock.move' 
@@ -168,23 +179,25 @@ class StockMove(models.Model):
         return lines
 
         
-
     def _prepare_valuation_layer_vals(self):
         vals = super()._prepare_valuation_layer_vals()
 
-        # المصدر الأساسي: picking
-        ou = (
-            self.picking_id.operation_unit_id
-            if self.picking_id and self.picking_id.operation_unit_id
-            else self.env.user.default_ou_id
-        )
+        # 1️⃣ OU من stock.move
+        ou = self.operation_unit_id
+
+        # 2️⃣ fallback من picking
+        if not ou and self.picking_id:
+            ou = self.picking_id.operation_unit_id
+
+        # 3️⃣ fallback من المستخدم
+        if not ou:
+            ou = self.env.user.default_ou_id
 
         if ou:
             vals['operation_unit_id'] = ou.id
 
         return vals
  
-
 
 
 
