@@ -32,15 +32,15 @@ class StockPicking(models.Model):
 
         return super().create(vals)
 
-
-    @api.constrains('operation_unit_id')
-    def _check_ou_required(self):
-        for rec in self:
-            if not rec.operation_unit_id:
+    def button_validate(self):
+        for picking in self:
+            if not picking.operation_unit_id:
                 raise ValidationError(
-                    'picking Operation Unit is required'
+                    'Operation Unit is required before validating the picking.'
                 )
+        return super().button_validate()
 
+        
     @api.constrains('operation_unit_id', 'company_id')
     def _check_picking_ou_validity(self):
         for picking in self:

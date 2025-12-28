@@ -30,6 +30,8 @@ class xx_sale_order(models.Model):
         return invoice_vals
 
     def _prepare_picking_vals(self):
+
+        
         vals = super()._prepare_picking_vals()
 
         if self.operation_unit_id:
