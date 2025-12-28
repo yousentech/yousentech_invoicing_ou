@@ -32,3 +32,13 @@ class PurchaseOrder(models.Model):
         invoice_vals.update({"operation_unit_id": self.operation_unit_id.id or False})
         return invoice_vals
 
+
+    def _prepare_picking(self):
+        vals = super()._prepare_picking()
+
+        if self.operation_unit_id:
+            vals['operation_unit_id'] = self.operation_unit_id.id
+        else:
+            vals['operation_unit_id'] = self.env.user.default_ou_id.id
+
+        return vals

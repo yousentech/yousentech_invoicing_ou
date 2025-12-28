@@ -28,3 +28,13 @@ class xx_sale_order(models.Model):
         invoice_vals = super(xx_sale_order, self)._prepare_invoice()
         invoice_vals.update({"operation_unit_id": self.operation_unit_id.id or False})
         return invoice_vals
+
+    def _prepare_picking_vals(self):
+        vals = super()._prepare_picking_vals()
+
+        if self.operation_unit_id:
+            vals['operation_unit_id'] = self.operation_unit_id.id
+        else:
+            vals['operation_unit_id'] = self.env.user.default_ou_id.id
+
+        return vals
