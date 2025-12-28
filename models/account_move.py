@@ -111,6 +111,13 @@ class AccountMove(models.Model):
                     "The selected Operation Unit is not allowed for the current user."
                 )
 
+    def action_post(self):
+        for move in self:
+            if not move.operation_unit_id:
+                raise ValidationError(
+                    'Operation Unit is required before posting the accounting entry.'
+                )
+        return super().action_post()
 
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line' 
