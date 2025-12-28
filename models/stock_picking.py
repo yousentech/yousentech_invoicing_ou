@@ -55,7 +55,6 @@ class StockMove(models.Model):
     _inherit = 'stock.move' 
 
 
-    
     def _get_new_picking_values(self):
         vals = super()._get_new_picking_values()
 
@@ -79,6 +78,15 @@ class StockMove(models.Model):
             )
             return vals
 
+        # fallback
+        vals['operation_unit_id'] = self.env.user.default_ou_id.id
+        _logger.warning(
+            "OU FROM USER DEFAULT → %s",
+            vals['operation_unit_id']
+        )
+        return vals
+
+ 
     def _prepare_account_move_vals(self):
         vals = super()._prepare_account_move_vals()
 
@@ -106,20 +114,20 @@ class StockMove(models.Model):
 
 
    
-    # def _prepare_account_move_line(self, qty, cost, credit_account_id, debit_account_id):
-    #     res = super()._prepare_account_move_line(qty, cost, credit_account_id, debit_account_id)
-    #     ou = False
+    def _prepare_account_move_line(self, qty, cost, credit_account_id, debit_account_id):
+        res = super()._prepare_account_move_line(qty, cost, credit_account_id, debit_account_id)
+        ou = False
 
-    #     if self.stock_valuation_layer_ids:
-    #         ou = self.stock_valuation_layer_ids[0].operation_unit_id
-    #     if not ou and self.picking_id and self.picking_id.operation_unit_id:
-    #         ou = self.picking_id.operation_unit_id
-    #     if not ou:
-    #         ou = self.env.user.default_ou_id
+        if self.stock_valuation_layer_ids:
+            ou = self.stock_valuation_layer_ids[0].operation_unit_id
+        if not ou and self.picking_id and self.picking_id.operation_unit_id:
+            ou = self.picking_id.operation_unit_id
+        if not ou:
+            ou = self.env.user.default_ou_id
 
-    #     for line in res:
-    #         line[2]['operation_unit_id'] = ou.id if ou else False
-    #     return res
+        for line in res:
+            line[2]['operation_unit_id'] = ou.id if ou else False
+        return res
 
         
 
@@ -139,13 +147,7 @@ class StockMove(models.Model):
         return vals
  
 
-        # fallback
-        vals['operation_unit_id'] = self.env.user.default_ou_id.id
-        _logger.warning(
-            "OU FROM USER DEFAULT → %s",
-            vals['operation_unit_id']
-        )
-        return vals
+
 
 
 class StockValuationLayer(models.Model):
