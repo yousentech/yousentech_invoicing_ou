@@ -13,9 +13,16 @@ class AccountMove(models.Model):
 
     @api.model
     def create(self, vals):
-        move = super().create(vals)
 
-        if not move.operation_unit_id:
+        if not vals.get('operation_unit_id'):
+            vals['operation_unit_id'] = self.env.user.default_ou_id.id
+
+        return super().create(vals)
+
+
+        # move = super().create(vals)
+
+        # if not move.operation_unit_id:
  
             # sale_lines = move.invoice_line_ids.mapped('sale_line_ids')
             # if sale_lines:
@@ -27,9 +34,9 @@ class AccountMove(models.Model):
             #     move.operation_unit_id = purchase_lines[0].order_id.operation_unit_id.id
             #     return move
  
-            move.operation_unit_id = self.env.user.default_ou_id.id
+        #     move.operation_unit_id = self.env.user.default_ou_id.id
 
-        return move
+        # return move
 
         # move = super().create(vals)
         # if not move.operation_unit_id:
