@@ -2,6 +2,9 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 from datetime import datetime
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
@@ -16,8 +19,7 @@ class StockPicking(models.Model):
     @api.model
     def create(self, vals):
         res = super().create(vals)
-        print("res++++++++++++++",res)
-        print("sale_id++++++++++++++",res.sale_id)
+       
         if res.sale_id:
             sale = self.env['sale.order'].browse(res.sale_id.id)
             res.operation_unit_id = sale.operation_unit_id.id
@@ -121,7 +123,38 @@ class StockMove(models.Model):
             vals['operation_unit_id'] = ou.id
 
         return vals
+ 
 
+    def _get_new_picking_values(self):
+        vals = super()._get_new_picking_values()
+
+        # من أمر البيع
+        if self.sale_line_id and self.sale_line_id.order_id.operation_unit_id:
+            vals['operation_unit_id'] = self.sale_line_id.order_id.operation_unit_id.id
+            _logger.warning(
+                "OU FROM SALE ORDER %s → %s",
+                self.sale_line_id.order_id.name,
+                vals['operation_unit_id']
+            )
+            return vals
+
+        # من أمر الشراء
+        if self.purchase_line_id and self.purchase_line_id.order_id.operation_unit_id:
+            vals['operation_unit_id'] = self.purchase_line_id.order_id.operation_unit_id.id
+            _logger.warning(
+                "OU FROM PURCHASE ORDER %s → %s",
+                self.purchase_line_id.order_id.name,
+                vals['operation_unit_id']
+            )
+            return vals
+
+        # fallback
+        vals['operation_unit_id'] = self.env.user.default_ou_id.id
+        _logger.warning(
+            "OU FROM USER DEFAULT → %s",
+            vals['operation_unit_id']
+        )
+        return vals
 
 
 class StockValuationLayer(models.Model):
