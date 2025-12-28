@@ -66,6 +66,13 @@ class StockPicking(models.Model):
 class StockMove(models.Model):
     _inherit = 'stock.move' 
 
+    operation_unit_id = fields.Many2one(
+        'operation.unit',
+        readonly=True,
+       
+        copy=False
+    )
+
 
     def _get_new_picking_values(self):
         vals = super()._get_new_picking_values()
