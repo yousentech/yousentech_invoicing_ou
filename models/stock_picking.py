@@ -15,10 +15,10 @@ class StockPicking(models.Model):
 
     @api.model
     def create(self, vals):
- 
-        if vals.get('sale_id'):
-            sale = self.env['sale.order'].browse(vals['sale_id'])
-            vals['operation_unit_id'] = sale.operation_unit_id.id
+        res = super().create(vals)
+        if res.sale_id:
+            sale = self.env['sale.order'].browse(res.sale_id.id)
+            res.operation_unit_id = sale.operation_unit_id.id
 
       
         elif vals.get('purchase_id'):
@@ -29,7 +29,8 @@ class StockPicking(models.Model):
         elif not vals.get('operation_unit_id'):
             vals['operation_unit_id'] = self.env.user.default_ou_id.id
 
-        return super().create(vals)
+        return res
+
 
     def button_validate(self):
         for picking in self:
