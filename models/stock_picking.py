@@ -16,6 +16,8 @@ class StockPicking(models.Model):
     @api.model
     def create(self, vals):
         res = super().create(vals)
+        print("res++++++++++++++",res)
+        print("sale_id++++++++++++++",res.sale_id)
         if res.sale_id:
             sale = self.env['sale.order'].browse(res.sale_id.id)
             res.operation_unit_id = sale.operation_unit_id.id
