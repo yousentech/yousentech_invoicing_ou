@@ -38,7 +38,7 @@ class StockPicking(models.Model):
         for rec in self:
             if not rec.operation_unit_id:
                 raise ValidationError(
-                    'Operation Unit is required'
+                    'picking Operation Unit is required'
                 )
 
     @api.constrains('operation_unit_id', 'company_id')

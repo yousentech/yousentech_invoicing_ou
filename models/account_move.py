@@ -64,7 +64,7 @@ class AccountMove(models.Model):
         for rec in self:
             if not rec.operation_unit_id:
                 raise ValidationError(
-                    'Operation Unit is required'
+                    'move Operation Unit is required'
                 )
  
     def _get_outstanding_info_JSON(self):
