@@ -38,12 +38,7 @@ class StockPicking(models.Model):
                 raise ValidationError(
                     'Operation Unit is required before validating the picking.'
                 )
-        return super().button_validate()
 
-        
-    @api.constrains('operation_unit_id', 'company_id')
-    def _check_picking_ou_validity(self):
-        for picking in self:
             ou = picking.operation_unit_id
             user = self.env.user
 
@@ -60,6 +55,8 @@ class StockPicking(models.Model):
                     "The selected Operation Unit is not allowed for the current user."
                 )
 
+        return super().button_validate()
+ 
 class StockMove(models.Model):
     _inherit = 'stock.move' 
 
