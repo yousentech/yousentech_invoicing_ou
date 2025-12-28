@@ -17,15 +17,15 @@ class AccountMove(models.Model):
 
         if not move.operation_unit_id:
  
-            sale_lines = move.invoice_line_ids.mapped('sale_line_ids')
-            if sale_lines:
-                move.operation_unit_id = sale_lines[0].order_id.operation_unit_id.id
-                return move
+            # sale_lines = move.invoice_line_ids.mapped('sale_line_ids')
+            # if sale_lines:
+            #     move.operation_unit_id = sale_lines[0].order_id.operation_unit_id.id
+            #     return move
  
-            purchase_lines = move.invoice_line_ids.mapped('purchase_line_id')
-            if purchase_lines:
-                move.operation_unit_id = purchase_lines[0].order_id.operation_unit_id.id
-                return move
+            # purchase_lines = move.invoice_line_ids.mapped('purchase_line_id')
+            # if purchase_lines:
+            #     move.operation_unit_id = purchase_lines[0].order_id.operation_unit_id.id
+            #     return move
  
             move.operation_unit_id = self.env.user.default_ou_id.id
 

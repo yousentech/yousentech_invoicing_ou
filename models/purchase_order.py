@@ -26,3 +26,9 @@ class PurchaseOrder(models.Model):
                 raise ValidationError(
                     'Operation Unit is required'
                 )
+    
+    def _prepare_invoice(self):
+        invoice_vals = super(PurchaseOrder, self)._prepare_invoice()
+        invoice_vals.update({"operation_unit_id": self.operation_unit_id.id or False})
+        return invoice_vals
+
