@@ -57,7 +57,7 @@ class StockPicking(models.Model):
     def _assign_ou_to_moves(self):
         for picking in self:
             if picking.operation_unit_id:
-                for line in picking.move_ids_without_package
+                for line in picking.move_ids_without_package:
                     line.write({
                             'operation_unit_id': picking.operation_unit_id.id
                         })
