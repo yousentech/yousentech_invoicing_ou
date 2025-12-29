@@ -119,6 +119,25 @@ class AccountMove(models.Model):
                 )
         return super().action_post()
 
+    def action_register_payment(self):
+        res = super().action_register_payment()
+
+        res["context"] = {"default_operation_unit_id": self.operation_unit_id.id}
+
+        return res
+
+        
+class AccountPaymentRegister(models.TransientModel):
+    _inherit = "account.payment.register"
+
+
+    operation_unit_id = fields.Many2one(
+        'operation.unit',
+        readonly=True,
+        copy=False
+    )
+
+
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line' 
 
