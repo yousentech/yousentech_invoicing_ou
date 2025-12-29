@@ -147,7 +147,7 @@ class AccountMove(models.Model):
                 'default_operation_unit_id': self.operation_unit_id.id
             })
             action['context'] = ctx
-
+            print("action_register_payment==========",action)
         return action
 
 class AccountPaymentRegister(models.TransientModel):
