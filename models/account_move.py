@@ -170,17 +170,16 @@ class AccountMove(models.Model):
         )
 
 
-    
-    def _create_payments(self):
-        # استدعاء السوبر لإنشاء سجلات الدفع (account.payment)
-        payments = super()._create_payments()
+    def _prepare_payment_vals_list(self, move_lines=None):
+        # 1. جلب القيم الافتراضية التي يحضرها أودو تلقائياً
+        res = super()._prepare_payment_vals_list(move_lines=move_lines)
         
-        # إذا كانت القيمة موجودة في الويزارد، انقلها لكل دفعة تم إنشاؤها
+        # 2. إضافة قيمتك المخصصة لكل قاموس دفع في القائمة
         if self.operation_unit_id:
-            payments.write({
-                'operation_unit_id': self.operation_unit_id.id
-            })
-        return payments
+            for vals in res:
+                vals['operation_unit_id'] = self.operation_unit_id.id
+                
+        return res
 
 
 class AccountMoveLine(models.Model):
