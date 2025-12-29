@@ -44,13 +44,13 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
              
-            <xpath expr = "//group[@id = 'header_left_group']" position="inside"> >
+                <xpath expr = "//group[@id = 'header_left_group']" position="inside">
 
-                        <field name="operation_unit_id" force_save="1"  readonly="1"/>
-            </xpath>
+                            <field name="operation_unit_id" force_save="1"  readonly="1"/>
+                </xpath>
 
                   
-              <xpath expr = "//field[@name = 'invoice_line_ids']/tree/field[@name = 'account_id']" position="after">
+                <xpath expr = "//field[@name = 'invoice_line_ids']/tree/field[@name = 'account_id']" position="after">
                        <field name="operation_unit_id" force_save="1" optional="hide" options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,'no_create': True}" />
  			    </xpath>
                 <xpath expr = "//field[@name = 'line_ids']/tree/field[@name = 'account_id']" position="after">
