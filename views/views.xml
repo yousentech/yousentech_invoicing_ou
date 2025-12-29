@@ -68,7 +68,7 @@
         <field name="arch" type="xml">
              
                 <xpath expr = "//field[@name = 'communication']" position="after">
-                    <field name="operation_unit_id" force_save="1"  />
+                    <field name="operation_unit_id"  />
                 </xpath>
  
 
