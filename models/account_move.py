@@ -67,25 +67,48 @@ class AccountMove(models.Model):
                     'move Operation Unit is required'
                 )
  
-  
-    def _compute_payments_widget_to_reconcile_info(self):
+    def _get_outstanding_info_JSON(self):
         self.ensure_one()
-        result = super(AccountMove,self)._compute_payments_widget_to_reconcile_info()
+        result = super()._get_outstanding_info_JSON()
         print("_get_outstanding_info_JSON==============",result)
-        # لو ما فيه OU على الفاتورة → نرجع الطبيعي
-        if not self.operation_unit_id or not result:
+        # لو ما فيه OU على الفاتورة أو ما فيه مدفوعات
+        if not self.operation_unit_id or not result or not result.get('content'):
             return result
 
-        ou_id = self.operation_unit_id.id
-
-        # فلترة المدفوعات حسب OU
+        invoice_ou_id = self.operation_unit_id.id
         filtered_content = []
-        for line in result.get('content', []):
-            if line.get('operation_unit_id') == ou_id:
+
+        for line in result['content']:
+            aml_id = line.get('line_id')
+            if not aml_id:
+                continue
+
+            aml = self.env['account.move.line'].browse(aml_id)
+
+            # نعرض فقط المدفوعات التابعة لنفس OU
+            if aml.operation_unit_id and aml.operation_unit_id.id == invoice_ou_id:
                 filtered_content.append(line)
-        print("_get_outstanding_info_JSON======2========",filtered_content)
+
         result['content'] = filtered_content
         return result
+    # def _compute_payments_widget_to_reconcile_info(self):
+    #     self.ensure_one()
+    #     result = super(AccountMove,self)._compute_payments_widget_to_reconcile_info()
+    #     print("_get_outstanding_info_JSON==============",result)
+    #     # لو ما فيه OU على الفاتورة → نرجع الطبيعي
+    #     if not self.operation_unit_id or not result:
+    #         return result
+
+    #     ou_id = self.operation_unit_id.id
+
+    #     # فلترة المدفوعات حسب OU
+    #     filtered_content = []
+    #     for line in result.get('content', []):
+    #         if line.get('operation_unit_id') == ou_id:
+    #             filtered_content.append(line)
+    #     print("_get_outstanding_info_JSON======2========",filtered_content)
+    #     result['content'] = filtered_content
+    #     return result
 
 
         
@@ -116,12 +139,16 @@ class AccountMove(models.Model):
         return super().action_post()
 
     def action_register_payment(self):
-        res = super().action_register_payment()
-        print("action_register_payment===========",res)
-        res["context"] = {"default_operation_unit_id": self.operation_unit_id.id}
-        print("action_register_payment222222222===========",res)
-        return res
+        action = super().action_register_payment()
 
+        if self.operation_unit_id:
+            ctx = dict(action.get('context', {}))
+            ctx.update({
+                'default_operation_unit_id': self.operation_unit_id.id
+            })
+            action['context'] = ctx
+
+        return action
 
 class AccountPaymentRegister(models.TransientModel):
     _inherit = "account.payment.register"
@@ -132,6 +159,15 @@ class AccountPaymentRegister(models.TransientModel):
         readonly=True,
         copy=False
     )
+
+    
+    def action_create_payments(self):
+        vals = super().action_create_payments()
+
+        if self.operation_unit_id:
+            vals['operation_unit_id'] = self.operation_unit_id.id
+
+        return vals
 
 
 class AccountMoveLine(models.Model):
