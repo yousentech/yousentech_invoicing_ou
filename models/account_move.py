@@ -144,7 +144,7 @@ class AccountMove(models.Model):
         if self.operation_unit_id:
             ctx = dict(action.get('context', {}))
             ctx.update({
-                'default_operation_unit_id': self.operation_unit_id.id
+                'operation_unit_id': self.operation_unit_id.id
             })
             action['context'] = ctx
             print("action_register_payment==========",action)
