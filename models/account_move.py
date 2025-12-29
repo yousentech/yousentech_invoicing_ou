@@ -137,18 +137,28 @@ class AccountMove(models.Model):
                     'Operation Unit is required before posting the accounting entry.'
                 )
         return super().action_post()
-
     def action_register_payment(self):
-        action = super().action_register_payment()
+        # استدعاء الدالة الأصلية للحصول على نافذة الدفع
+        res = super(AccountMove, self).action_register_payment()
+        
+        # إضافة القيمة الخاصة بك إلى الـ context
+        res['context'].update({
+            'default_x_custom_field': self.x_custom_field,
+        })
+        print("action_register_payment==========",res)
 
-        if self.operation_unit_id:
-            ctx = dict(action.get('context', {}))
-            ctx.update({
-                'operation_unit_id': self.operation_unit_id.id
-            })
-            action['context'] = ctx
-            print("action_register_payment==========",action)
-        return action
+        return res
+    # def action_register_payment(self):
+    #     action = super().action_register_payment()
+
+    #     if self.operation_unit_id:
+    #         ctx = dict(action.get('context', {}))
+    #         ctx.update({
+    #             'operation_unit_id': self.operation_unit_id.id
+    #         })
+    #         action['context'] = ctx
+    #         print("action_register_payment==========",action)
+    #     return action
 
 class AccountPaymentRegister(models.TransientModel):
     _inherit = "account.payment.register"
