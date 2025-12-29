@@ -166,8 +166,7 @@ class AccountMove(models.Model):
         operation_unit_id = fields.Many2one(
             'operation.unit',
             string="Operation Unit",
-            readonly=True, # سيبقى للقراءة فقط ويأخذ قيمته من الـ Context
-            store=True
+            
         )
 
 
