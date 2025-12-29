@@ -45,8 +45,7 @@
         <field name="arch" type="xml">
              
                 <xpath expr = "//group[@id = 'header_left_group']" position="inside">
-
-                            <field name="operation_unit_id" force_save="1"  readonly="1"/>
+                    <field name="operation_unit_id" force_save="1"  readonly="1"/>
                 </xpath>
 
                   
@@ -60,6 +59,22 @@
 
         </field>
     </record>
+
+      <!-- ===================view_account_payment_register_form   =================== -->
+    <record id="view_account_payment_register_form_ou" model="ir.ui.view">
+        <field name="name">view_account_payment_register_form_ou</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_payment_register_form"/>
+        <field name="arch" type="xml">
+             
+                <xpath expr = "//field[@name = 'amount']" position="before">
+                    <field name="operation_unit_id" force_save="1"  readonly="1"/>
+                </xpath>
+ 
+
+        </field>
+    </record>
+
  
     <!-- =================== Account Payment =================== -->
     <record id="view_account_payment_form_ou" model="ir.ui.view">
