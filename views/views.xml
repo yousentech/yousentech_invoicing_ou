@@ -67,7 +67,7 @@
         <field name="inherit_id" ref="account.view_account_payment_register_form"/>
         <field name="arch" type="xml">
              
-                <xpath expr = "//field[@name = 'amount']" position="before">
+                <xpath expr = "//field[@name = 'communication']" position="after">
                     <field name="operation_unit_id" force_save="1"  readonly="1"/>
                 </xpath>
  
