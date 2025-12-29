@@ -67,29 +67,25 @@ class AccountMove(models.Model):
                     'move Operation Unit is required'
                 )
  
+  
     def _get_outstanding_info_JSON(self):
         self.ensure_one()
+        result = super()._get_outstanding_info_JSON()
 
-        info = super()._get_outstanding_info_JSON()
+        # لو ما فيه OU على الفاتورة → نرجع الطبيعي
+        if not self.operation_unit_id or not result:
+            return result
 
-        # لو ما في OU على الفاتورة، نترك السلوك الافتراضي
-        if not self.operation_unit_id:
-            return info
+        ou_id = self.operation_unit_id.id
 
-        # outstanding lines
-        lines = info.get('lines', [])
-        filtered_lines = []
+        # فلترة المدفوعات حسب OU
+        filtered_content = []
+        for line in result.get('content', []):
+            if line.get('operation_unit_id') == ou_id:
+                filtered_content.append(line)
 
-        for line in lines:
-            aml = self.env['account.move.line'].browse(line.get('id'))
-            if aml.operation_unit_id == self.operation_unit_id:
-                filtered_lines.append(line)
-
-        info['lines'] = filtered_lines
-        info['title'] = info.get('title')
-        info['outstanding'] = bool(filtered_lines)
-
-        return info
+        result['content'] = filtered_content
+        return result
 
 
         
@@ -126,7 +122,7 @@ class AccountMove(models.Model):
 
         return res
 
-        
+
 class AccountPaymentRegister(models.TransientModel):
     _inherit = "account.payment.register"
 
