@@ -143,7 +143,7 @@ class AccountMove(models.Model):
         
         # إضافة القيمة الخاصة بك إلى الـ context
         res['context'].update({
-            'default_x_custom_field': self.x_custom_field,
+            'default_operation_unit_id': self.operation_unit_id,
         })
         print("action_register_payment==========",res)
 
