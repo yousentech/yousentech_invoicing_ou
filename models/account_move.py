@@ -119,7 +119,7 @@ class AccountMove(models.Model):
         res = super().action_register_payment()
         print("action_register_payment===========",res)
         res["context"] = {"default_operation_unit_id": self.operation_unit_id.id}
-
+        print("action_register_payment222222222===========",res)
         return res
 
 
