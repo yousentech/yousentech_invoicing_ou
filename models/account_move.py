@@ -160,24 +160,28 @@ class AccountMove(models.Model):
     #         print("action_register_payment==========",action)
     #     return action
 
-class AccountPaymentRegister(models.TransientModel):
-    _inherit = "account.payment.register"
+    class AccountPaymentRegister(models.TransientModel):
+        _inherit = "account.payment.register"
 
+        operation_unit_id = fields.Many2one(
+            'operation.unit',
+            string="Operation Unit",
+            readonly=True, # سيبقى للقراءة فقط ويأخذ قيمته من الـ Context
+            store=True
+        )
 
-    operation_unit_id = fields.Many2one(
-        'operation.unit',
-        readonly=True,
-        copy=False
-    )
 
     
-    def action_create_payments(self):
-        vals = super().action_create_payments()
-
+    def _create_payments(self):
+        # استدعاء السوبر لإنشاء سجلات الدفع (account.payment)
+        payments = super()._create_payments()
+        
+        # إذا كانت القيمة موجودة في الويزارد، انقلها لكل دفعة تم إنشاؤها
         if self.operation_unit_id:
-            vals['operation_unit_id'] = self.operation_unit_id.id
-
-        return vals
+            payments.write({
+                'operation_unit_id': self.operation_unit_id.id
+            })
+        return payments
 
 
 class AccountMoveLine(models.Model):
@@ -185,7 +189,7 @@ class AccountMoveLine(models.Model):
 
     operation_unit_id = fields.Many2one(
         'operation.unit',
-        readonly=True,
+       
         copy=False
     )
 
