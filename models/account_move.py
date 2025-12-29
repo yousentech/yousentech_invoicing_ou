@@ -71,7 +71,7 @@ class AccountMove(models.Model):
     def _get_outstanding_info_JSON(self):
         self.ensure_one()
         result = super()._get_outstanding_info_JSON()
-
+        print("_get_outstanding_info_JSON==============")
         # لو ما فيه OU على الفاتورة → نرجع الطبيعي
         if not self.operation_unit_id or not result:
             return result
@@ -83,7 +83,7 @@ class AccountMove(models.Model):
         for line in result.get('content', []):
             if line.get('operation_unit_id') == ou_id:
                 filtered_content.append(line)
-
+        print("_get_outstanding_info_JSON======2========",filtered_content)
         result['content'] = filtered_content
         return result
 
