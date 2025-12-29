@@ -68,9 +68,9 @@ class AccountMove(models.Model):
                 )
  
   
-    def _get_outstanding_info_JSON(self):
+    def _compute_payments_widget_to_reconcile_info(self):
         self.ensure_one()
-        result = super()._get_outstanding_info_JSON()
+        result = super()._compute_payments_widget_to_reconcile_info()
         print("_get_outstanding_info_JSON==============")
         # لو ما فيه OU على الفاتورة → نرجع الطبيعي
         if not self.operation_unit_id or not result:
