@@ -28,7 +28,9 @@ class AccountPayment(models.Model):
  
         if payment.move_id and payment.move_id.operation_unit_id:
             payment.operation_unit_id = payment.move_id.operation_unit_id.id
+            print("vals.get('operation_unit_id'):**********222*********",payment.operation_unit_id)
 
+        
   
         else:
             payment.operation_unit_id = self.env.user.default_ou_id.id
