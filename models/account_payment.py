@@ -33,6 +33,8 @@ class AccountPayment(models.Model):
         
   
         else:
+            print("vals.get('operation_unit_id'):**********333*********",payment.operation_unit_id)
+
             payment.operation_unit_id = self.env.user.default_ou_id.id
 
         return payment
