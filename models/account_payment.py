@@ -14,14 +14,10 @@ class AccountPayment(models.Model):
 
     @api.model
     def create(self, vals):
-        print("vals.get('operation_unit_id'):*********222**********",vals.get('operation_unit_id'))
-
+      
         if not vals.get('operation_unit_id'):
             vals['operation_unit_id'] = self.env.user.default_ou_id.id
-            print("vals.get('operation_unit_id'):*******333************",vals.get('operation_unit_id'))
-
-            
-        print("vals.get('operation_unit_id'):*******444************",vals.get('operation_unit_id'))
+           
         return super().create(vals)
 
 
@@ -40,10 +36,10 @@ class AccountPayment(models.Model):
 
         # return payment
    
-    # @api.constrains('operation_unit_id')
-    # def _check_ou_required(self):
-    #     for rec in self:
-    #         if not rec.operation_unit_id:
-    #             raise ValidationError(
-    #                 'Operation Unit is required'
-    #             )
+    @api.constrains('operation_unit_id')
+    def _check_ou_required(self):
+        for rec in self:
+            if not rec.operation_unit_id:
+                raise ValidationError(
+                    'Operation Unit is required'
+                )
