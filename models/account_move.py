@@ -184,12 +184,16 @@ class AccountPaymentRegister(models.TransientModel):
                 
         return res
 
-
     def _init_payments(self, to_process, edit_mode=False):
+        # 🔹 حقن OU في قيم الإنشاء
+        for vals in to_process:
+            create_vals = vals.get('create_vals', {})
 
-        res = super()._init_payments(self, to_process)
-        print("res===============================",res)
-        return res
+            if self.operation_unit_id:
+                create_vals['operation_unit_id'] = self.operation_unit_id.id
+
+        # 🔹 نكمل السلوك الأصلي
+        return super()._init_payments(to_process, edit_mode=edit_mode)
 
 
 class AccountMoveLine(models.Model):
