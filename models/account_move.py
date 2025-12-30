@@ -185,6 +185,13 @@ class AccountPaymentRegister(models.TransientModel):
         return res
 
 
+    def _init_payments(self, to_process, edit_mode=False):
+
+        res = super.()._init_payments(self, to_process, edit_mode=False)
+        print("res===============================",res)
+        return res
+
+
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line' 
 
