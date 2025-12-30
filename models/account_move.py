@@ -186,11 +186,16 @@ class AccountPaymentRegister(models.TransientModel):
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line' 
 
+     
+
     operation_unit_id = fields.Many2one(
         'operation.unit',
-       
+        string='Operation Unit',
+        readonly=True,
+        related='line_ids.move_id.operation_unit_id',
         copy=False
     )
+
 
     @api.constrains('operation_unit_id')
     def _check_ou_required(self):
