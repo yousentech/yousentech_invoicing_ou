@@ -13,7 +13,7 @@ class AccountMove(models.Model):
 
     @api.model
     def create(self, vals):
-        print("vals.get('operation_unit_id'):**********222*********",vals.get('operation_unit_id'))
+        print("vals.get('operation_unit_id'):**********111*********",vals.get('operation_unit_id'))
 
         if not vals.get('operation_unit_id'):
             vals['operation_unit_id'] = self.env.user.default_ou_id.id
