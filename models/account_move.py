@@ -94,17 +94,18 @@ class AccountMove(models.Model):
                     'Operation Unit is required before posting the accounting entry.'
                 )
         return super().action_post()
-    def action_register_payment(self):
-        # استدعاء الدالة الأصلية للحصول على نافذة الدفع
-        res = super(AccountMove, self).action_register_payment()
-        
-        # إضافة القيمة الخاصة بك إلى الـ context
-        res['context'].update({
-            'default_operation_unit_id': self.operation_unit_id,
-        })
-        print("action_register_payment==========",res)
 
-        return res
+
+    # def action_register_payment(self):
+    #     # استدعاء الدالة الأصلية للحصول على نافذة الدفع
+    #     res = super(AccountMove, self).action_register_payment()
+        
+    #     # إضافة القيمة الخاصة بك إلى الـ context
+    #     res['context'].update({
+    #         'default_operation_unit_id': self.operation_unit_id,
+    #     })
+       
+    #     return res
     # def action_register_payment(self):
     #     action = super().action_register_payment()
 
