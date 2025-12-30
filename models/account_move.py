@@ -197,13 +197,13 @@ class AccountMoveLine(models.Model):
     )
 
 
-    @api.constrains('operation_unit_id')
-    def _check_ou_required(self):
-        for line in self:
-            if not line.operation_unit_id:
-                raise ValidationError(
-                    'Operation Unit is required on journal items.'
-                )
+    # @api.constrains('operation_unit_id')
+    # def _check_ou_required(self):
+    #     for line in self:
+    #         if not line.operation_unit_id:
+    #             raise ValidationError(
+    #                 'Operation Unit is required on journal items.'
+    #             )
     # @api.model
     # def create(self, vals):
 
