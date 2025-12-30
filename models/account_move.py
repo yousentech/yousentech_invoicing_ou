@@ -95,29 +95,7 @@ class AccountMove(models.Model):
                 )
         return super().action_post()
 
-
-    # def action_register_payment(self):
-    #     # استدعاء الدالة الأصلية للحصول على نافذة الدفع
-    #     res = super(AccountMove, self).action_register_payment()
-        
-    #     # إضافة القيمة الخاصة بك إلى الـ context
-    #     res['context'].update({
-    #         'default_operation_unit_id': self.operation_unit_id,
-    #     })
-       
-    #     return res
-    # def action_register_payment(self):
-    #     action = super().action_register_payment()
-
-    #     if self.operation_unit_id:
-    #         ctx = dict(action.get('context', {}))
-    #         ctx.update({
-    #             'operation_unit_id': self.operation_unit_id.id
-    #         })
-    #         action['context'] = ctx
-    #         print("action_register_payment==========",action)
-    #     return action
-
+ 
 class AccountPaymentRegister(models.TransientModel):
     _inherit = "account.payment.register"
 
@@ -127,19 +105,6 @@ class AccountPaymentRegister(models.TransientModel):
         readonly=True,
         related='line_ids.move_id.operation_unit_id',
         copy=False )
-
-
-    def _prepare_payment_vals_list(self, move_lines=None):
-        # 1. جلب القيم الافتراضية التي يحضرها أودو تلقائياً
-        res = super()._prepare_payment_vals_list(move_lines=move_lines)
-        
-        # 2. إضافة قيمتك المخصصة لكل قاموس دفع في القائمة
-        print("res",res)
-        if self.operation_unit_id:
-            for vals in res:
-                vals['operation_unit_id'] = self.operation_unit_id.id
-                
-        return res
 
     def _init_payments(self, to_process, edit_mode=False):
         # 🔹 حقن OU في قيم الإنشاء
