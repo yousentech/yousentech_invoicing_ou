@@ -14,7 +14,7 @@ class AccountPayment(models.Model):
 
     @api.model
     def create(self, vals):
-        print("vals.get('operation_unit_id'):*******************",vals.get('operation_unit_id'):)
+        print("vals.get('operation_unit_id'):*******************",vals.get('operation_unit_id'))
 
         # if not vals.get('operation_unit_id'):
 
