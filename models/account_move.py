@@ -13,38 +13,12 @@ class AccountMove(models.Model):
 
     @api.model
     def create(self, vals):
-        print("vals.get('operation_unit_id'):**********111*********",vals.get('operation_unit_id'))
-
+       
         if not vals.get('operation_unit_id'):
             vals['operation_unit_id'] = self.env.user.default_ou_id.id
 
         return super().create(vals)
-
-
-        # move = super().create(vals)
-
-        # if not move.operation_unit_id:
  
-            # sale_lines = move.invoice_line_ids.mapped('sale_line_ids')
-            # if sale_lines:
-            #     move.operation_unit_id = sale_lines[0].order_id.operation_unit_id.id
-            #     return move
- 
-            # purchase_lines = move.invoice_line_ids.mapped('purchase_line_id')
-            # if purchase_lines:
-            #     move.operation_unit_id = purchase_lines[0].order_id.operation_unit_id.id
-            #     return move
- 
-        #     move.operation_unit_id = self.env.user.default_ou_id.id
-
-        # return move
-
-        # move = super().create(vals)
-        # if not move.operation_unit_id:
-        #     ou = move._get_operation_unit_from_source()
-        #     if ou:
-        #         move.operation_unit_id = ou.id
-        # return move
    
     @api.constrains('invoice_line_ids')
     def _check_single_ou(self):
@@ -60,6 +34,8 @@ class AccountMove(models.Model):
                 raise ValidationError(
                     'You cannot mix multiple Operation Units in one invoice'
                 )
+
+                
     @api.constrains('operation_unit_id')
     def _check_ou_required(self):
         for rec in self:
@@ -71,7 +47,7 @@ class AccountMove(models.Model):
     def _get_outstanding_info_JSON(self):
         self.ensure_one()
         result = super()._get_outstanding_info_JSON()
-        print("_get_outstanding_info_JSON==============",result)
+    
         # لو ما فيه OU على الفاتورة أو ما فيه مدفوعات
         if not self.operation_unit_id or not result or not result.get('content'):
             return result
@@ -92,27 +68,7 @@ class AccountMove(models.Model):
 
         result['content'] = filtered_content
         return result
-    # def _compute_payments_widget_to_reconcile_info(self):
-    #     self.ensure_one()
-    #     result = super(AccountMove,self)._compute_payments_widget_to_reconcile_info()
-    #     print("_get_outstanding_info_JSON==============",result)
-    #     # لو ما فيه OU على الفاتورة → نرجع الطبيعي
-    #     if not self.operation_unit_id or not result:
-    #         return result
-
-    #     ou_id = self.operation_unit_id.id
-
-    #     # فلترة المدفوعات حسب OU
-    #     filtered_content = []
-    #     for line in result.get('content', []):
-    #         if line.get('operation_unit_id') == ou_id:
-    #             filtered_content.append(line)
-    #     print("_get_outstanding_info_JSON======2========",filtered_content)
-    #     result['content'] = filtered_content
-    #     return result
-
-
-        
+     
     @api.constrains('operation_unit_id', 'company_id')
     def _check_operation_unit_validity(self):
         for move in self:
