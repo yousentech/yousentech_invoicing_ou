@@ -187,7 +187,7 @@ class AccountPaymentRegister(models.TransientModel):
 
     def _init_payments(self, to_process, edit_mode=False):
 
-        res = super()._init_payments(self, to_process, edit_mode=False)
+        res = super()._init_payments(self, to_process)
         print("res===============================",res)
         return res
 
