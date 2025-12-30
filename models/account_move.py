@@ -160,7 +160,7 @@ class AccountMove(models.Model):
     #         print("action_register_payment==========",action)
     #     return action
 
-    class AccountPaymentRegister(models.TransientModel):
+class AccountPaymentRegister(models.TransientModel):
         _inherit = "account.payment.register"
 
         operation_unit_id = fields.Many2one(
