@@ -161,13 +161,13 @@ class AccountMove(models.Model):
     #     return action
 
 class AccountPaymentRegister(models.TransientModel):
-        _inherit = "account.payment.register"
+    _inherit = "account.payment.register"
 
-        operation_unit_id = fields.Many2one(
-            'operation.unit',
-            string="Operation Unit",
-            
-        )
+    operation_unit_id = fields.Many2one(
+        'operation.unit',
+        string="Operation Unit",
+        
+    )
 
 
     def _prepare_payment_vals_list(self, move_lines=None):
