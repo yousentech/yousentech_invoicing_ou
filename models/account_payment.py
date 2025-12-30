@@ -14,13 +14,14 @@ class AccountPayment(models.Model):
 
     @api.model
     def create(self, vals):
-        print("vals.get('operation_unit_id'):*******************",vals.get('operation_unit_id'))
+        print("vals.get('operation_unit_id'):*********222**********",vals.get('operation_unit_id'))
 
         if not vals.get('operation_unit_id'):
-
-            print("vals.get('operation_unit_id'):*******************",vals.get('operation_unit_id'):)
             vals['operation_unit_id'] = self.env.user.default_ou_id.id
+            print("vals.get('operation_unit_id'):*******333************",vals.get('operation_unit_id'):)
 
+            
+        print("vals.get('operation_unit_id'):*******444************",vals.get('operation_unit_id'):)
         return super().create(vals)
 
 
