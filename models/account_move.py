@@ -189,10 +189,13 @@ class AccountMoveLine(models.Model):
 
     operation_unit_id = fields.Many2one(
         'operation.unit',
-       
+        string='Operation Unit',
+        readonly=True,
+        related='move_id.operation_unit_id',
+        store=True,
         copy=False
     )
-    
+
 
     @api.constrains('operation_unit_id')
     def _check_ou_required(self):

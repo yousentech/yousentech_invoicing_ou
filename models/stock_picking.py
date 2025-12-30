@@ -214,6 +214,7 @@ class StockValuationLayer(models.Model):
         string='Operation Unit',
         readonly=True,
         related='stock_move_id.operation_unit_id',
+        store=True,
         copy=False
     )
 
