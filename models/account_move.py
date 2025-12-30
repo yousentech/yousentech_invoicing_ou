@@ -204,19 +204,19 @@ class AccountMoveLine(models.Model):
                 raise ValidationError(
                     'Operation Unit is required on journal items.'
                 )
-    @api.model
-    def create(self, vals):
+    # @api.model
+    # def create(self, vals):
 
-        if not vals.get('operation_unit_id'):
-            if vals.get('move_id'):
-                move = self.env['account.move'].browse(vals['move_id'])
-                if move.operation_unit_id:
-                    vals['operation_unit_id'] = move.operation_unit_id.id
+    #     if not vals.get('operation_unit_id'):
+    #         if vals.get('move_id'):
+    #             move = self.env['account.move'].browse(vals['move_id'])
+    #             if move.operation_unit_id:
+    #                 vals['operation_unit_id'] = move.operation_unit_id.id
 
-        # if not vals.get('operation_unit_id'):
-        #     vals['operation_unit_id'] = self.env.user.default_ou_id.id
+    #     # if not vals.get('operation_unit_id'):
+    #     #     vals['operation_unit_id'] = self.env.user.default_ou_id.id
 
-        return super().create(vals)
+    #     return super().create(vals)
     
     def reconcile(self):
         ous = self.mapped('operation_unit_id').filtered(lambda x: x)
