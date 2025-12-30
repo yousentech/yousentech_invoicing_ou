@@ -175,6 +175,7 @@ class AccountPaymentRegister(models.TransientModel):
         res = super()._prepare_payment_vals_list(move_lines=move_lines)
         
         # 2. إضافة قيمتك المخصصة لكل قاموس دفع في القائمة
+        print("res",res)
         if self.operation_unit_id:
             for vals in res:
                 vals['operation_unit_id'] = self.operation_unit_id.id
