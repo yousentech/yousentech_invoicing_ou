@@ -23,12 +23,8 @@ class AccountMove(models.Model):
     @api.constrains('invoice_line_ids')
     def _check_single_ou(self):
         for move in self:
-            ous = move.invoice_line_ids.mapped(
-                'sale_line_ids.order_id.operation_unit_id'
-            )
-            ous |= move.invoice_line_ids.mapped(
-                'purchase_line_id.order_id.operation_unit_id'
-            )
+            ous = move.invoice_line_ids.mapped('operation_unit_id')
+          
             ous = ous.filtered(lambda x: x)
             if len(ous) > 1:
                 raise ValidationError(
@@ -131,29 +127,7 @@ class AccountMoveLine(models.Model):
         store=True,
         copy=False
     )
-
-
-    # @api.constrains('operation_unit_id')
-    # def _check_ou_required(self):
-    #     for line in self:
-    #         if not line.operation_unit_id:
-    #             raise ValidationError(
-    #                 'Operation Unit is required on journal items.'
-    #             )
-    # @api.model
-    # def create(self, vals):
-
-    #     if not vals.get('operation_unit_id'):
-    #         if vals.get('move_id'):
-    #             move = self.env['account.move'].browse(vals['move_id'])
-    #             if move.operation_unit_id:
-    #                 vals['operation_unit_id'] = move.operation_unit_id.id
-
-    #     # if not vals.get('operation_unit_id'):
-    #     #     vals['operation_unit_id'] = self.env.user.default_ou_id.id
-
-    #     return super().create(vals)
-    
+ 
     def reconcile(self):
         ous = self.mapped('operation_unit_id').filtered(lambda x: x)
      
