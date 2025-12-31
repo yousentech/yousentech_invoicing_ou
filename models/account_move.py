@@ -20,15 +20,26 @@ class AccountMove(models.Model):
         return super().create(vals)
  
    
-    @api.constrains('invoice_line_ids')
+    @api.constrains('invoice_line_ids', 'operation_unit_id')
     def _check_single_ou(self):
         for move in self:
-            ous = move.invoice_line_ids.mapped('operation_unit_id')
-          
+            ous = self.env['operation.unit']
+
+            # 1️⃣ OU من الفاتورة نفسها
+            if move.operation_unit_id:
+                ous |= move.operation_unit_id
+
+            # 2️⃣ OU من سطور الفاتورة
+            for line in move.invoice_line_ids:
+                if line.operation_unit_id:
+                    ous |= line.operation_unit_id
+ 
+                
             ous = ous.filtered(lambda x: x)
+
             if len(ous) > 1:
                 raise ValidationError(
-                    'You cannot mix multiple Operation Units in one invoice'
+                    _('You cannot mix multiple Operation Units in one invoice.')
                 )
 
                 
