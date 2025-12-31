@@ -20,7 +20,7 @@ class StockPicking(models.Model):
     def create(self, vals):
         res = super().create(vals)
         if not res.operation_unit_id:
-            res.operation_unit_id = self.env.user.default_ou_id.id
+            res.operation_unit_id = self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == res.company_id.id).default_ou_id.id
 
         return res
 
@@ -97,7 +97,7 @@ class StockMove(models.Model):
             return vals
 
         # fallback
-        vals['operation_unit_id'] = self.env.user.default_ou_id.id
+        vals['operation_unit_id'] =  self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == self.company_id.id).default_ou_id.id
         _logger.warning(
             "OU FROM USER DEFAULT → %s",
             vals['operation_unit_id']
@@ -136,7 +136,7 @@ class StockMove(models.Model):
             ou = self.picking_id.operation_unit_id
  
         if not ou:
-            ou = self.env.user.default_ou_id
+            ou =  self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == self.company_id.id).default_ou_id
  
         if ou:
             vals['operation_unit_id'] = ou.id
@@ -171,7 +171,7 @@ class StockMove(models.Model):
 
         # 3️⃣ fallback
         if not ou:
-            ou = self.env.user.default_ou_id
+            ou =  self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == self.company_id.id).default_ou_id
 
         if ou:
             vals['operation_unit_id'] = ou.id
@@ -192,7 +192,7 @@ class StockMove(models.Model):
         ou = (
             self.stock_valuation_layer_ids[:1].operation_unit_id
             or self.picking_id.operation_unit_id
-            or self.env.user.default_ou_id
+            or  self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == self.company_id.id).default_ou_id
         )
 
         if ou:

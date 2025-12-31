@@ -15,7 +15,7 @@ class AccountMove(models.Model):
     def create(self, vals):
        
         if not vals.get('operation_unit_id'):
-            vals['operation_unit_id'] = self.env.user.default_ou_id.id
+            vals['operation_unit_id'] =  self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == vals.get('company_id')).default_ou_id.id
 
         return super().create(vals)
  
