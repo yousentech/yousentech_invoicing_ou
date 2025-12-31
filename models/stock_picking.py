@@ -19,7 +19,6 @@ class StockPicking(models.Model):
     @api.model
     def create(self, vals):
         res = super().create(vals)
-        
         if not res.operation_unit_id:
             res.operation_unit_id = self.env.user.default_ou_id.id
 

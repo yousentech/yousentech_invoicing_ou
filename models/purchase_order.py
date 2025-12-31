@@ -15,10 +15,10 @@ class PurchaseOrder(models.Model):
     @api.model
     def create(self, vals):
         if not vals.get('operation_unit_id'):
-            vals['operation_unit_id'] = self.env.user.default_ou_id.id
+            user = self.env.user
+            vals['operation_unit_id'] = user.default_ou_id.id
         return super().create(vals)
-   
-   
+  
     @api.constrains('operation_unit_id')
     def _check_ou_required(self):
         for rec in self:
@@ -26,19 +26,8 @@ class PurchaseOrder(models.Model):
                 raise ValidationError(
                     'Operation Unit is required'
                 )
-    
     def _prepare_invoice(self):
-        invoice_vals = super(PurchaseOrder, self)._prepare_invoice()
+        invoice_vals = super(xx_sale_order, self)._prepare_invoice()
         invoice_vals.update({"operation_unit_id": self.operation_unit_id.id or False})
         return invoice_vals
-
-
-    def _prepare_picking(self):
-        vals = super()._prepare_picking()
-
-        if self.operation_unit_id:
-            vals['operation_unit_id'] = self.operation_unit_id.id
-        else:
-            vals['operation_unit_id'] = self.env.user.default_ou_id.id
-
-        return vals
+ 
