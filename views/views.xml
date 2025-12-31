@@ -32,7 +32,7 @@
         <field name="arch" type="xml">
              
                 <xpath expr = "//field[@name = 'company_id']" position="after">
-                    <field name="operation_unit_id"  options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,'no_create': True}"/>
+                    <field name="operation_unit_id" optional="hide" options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,'no_create': True}"/>
                 </xpath>
 
                    
@@ -47,7 +47,7 @@
         <field name="arch" type="xml">
              
             <xpath expr = "//field[@name = 'company_id']" position="after">
-                <field name="operation_unit_id"  options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,'no_create': True}"/>
+                <field name="operation_unit_id"  optional="hide" options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,'no_create': True}"/>
             </xpath>
 
                    
@@ -62,7 +62,7 @@
         <field name="arch" type="xml">
              
             <xpath expr = "//field[@name = 'company_id']" position="after">
-                <field name="operation_unit_id"  options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,'no_create': True}"/>
+                <field name="operation_unit_id"  optional="hide" options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,'no_create': True}"/>
             </xpath>
 
                    
@@ -70,7 +70,7 @@
         </field>
     </record>
 
-     <!-- =================== Account Move tree =================== -->
+     <!-- =================== Account Move search =================== -->
     <record id="view_account_move_out_search_ou" model="ir.ui.view">
         <field name="name">view_account_move_out_search_ou</field>
         <field name="model">account.move</field>
@@ -118,7 +118,7 @@
         <field name="inherit_id" ref="account.view_account_payment_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='company_id']" position="after">
-                <field name="operation_unit_id"  options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,'no_create': True}"/>
+                <field name="operation_unit_id"  optional="hide" options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,'no_create': True}"/>
             </xpath>
         </field>
     </record>
@@ -128,7 +128,7 @@
         <field name="inherit_id" ref="account.view_account_supplier_payment_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='company_id']" position="after">
-                <field name="operation_unit_id"  options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,'no_create': True}"/>
+                <field name="operation_unit_id"  optional="hide" options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,'no_create': True}"/>
             </xpath>
         </field>
     </record>
