@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <notebook>
                 <page string="Operation Unit Settings" name="ou_user_setting">
-                    <group>
+                     
                         <field name="ou_config_ids">
                             <tree string="OU Defaults" editable="bottom">
                              
@@ -21,7 +21,7 @@
 
                             </tree>
                         </field>
-                    </group>
+                   
                   
                 </page>
             </notebook>
