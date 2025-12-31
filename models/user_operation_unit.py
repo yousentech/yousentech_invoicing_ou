@@ -6,7 +6,7 @@ class res_user_inventory_config(models.Model):
     _description = 'OU User Config'
 
     company_id = fields.Many2one('res.company', string='Company')
-    user_id = fields.Many2one('res.users',string='Users',)
+    user_id = fields.Many2one('res.users',string='Users', ondelete="cascade")
    
     default_ou_id = fields.Many2one(
         'operation.unit',
