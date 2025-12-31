@@ -43,7 +43,7 @@ class StockPicking(models.Model):
                     "The selected Operation Unit does not belong to the same company as this document."
                 )
 
-            if user.allowed_ou_ids and ou not in user.allowed_ou_ids:
+            if user.ou_config_ids.filtered(lambda x: x.company_id.id == picking.company_id.id).allowed_ou_ids and ou not in user.ou_config_ids.filtered(lambda x: x.company_id.id == picking.company_id.id).allowed_ou_ids:
                 raise ValidationError(
                     "The selected Operation Unit is not allowed for the current user."
                 )
