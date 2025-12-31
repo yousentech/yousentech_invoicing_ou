@@ -12,6 +12,20 @@ class PurchaseOrder(models.Model):
         copy=False
     )
 
+    
+    def _prepare_picking(self):
+        vals = super()._prepare_picking()
+
+        if self.operation_unit_id:
+            vals['operation_unit_id'] = self.operation_unit_id.id
+            _logger.warning(
+                "OU FROM PURCHASE ORDER %s → %s",
+                self.name,
+                vals['operation_unit_id']
+            )
+
+        return vals
+
     @api.model
     def create(self, vals):
         if not vals.get('operation_unit_id'):
@@ -27,7 +41,7 @@ class PurchaseOrder(models.Model):
                     'Operation Unit is required'
                 )
     def _prepare_invoice(self):
-        invoice_vals = super(xx_sale_order, self)._prepare_invoice()
+        invoice_vals = super(PurchaseOrder, self)._prepare_invoice()
         invoice_vals.update({"operation_unit_id": self.operation_unit_id.id or False})
         return invoice_vals
  

@@ -103,26 +103,7 @@ class StockMove(models.Model):
             vals['operation_unit_id']
         )
         return vals
-
  
-    # def _prepare_valuation_layer_vals(self):
-    #     vals = super()._prepare_valuation_layer_vals()
-
-    #     # 1️⃣ OU من stock.move
-    #     ou = self.operation_unit_id
-
-    #     # 2️⃣ fallback من picking
-    #     if not ou and self.picking_id:
-    #         ou = self.picking_id.operation_unit_id
-
-    #     # 3️⃣ fallback من المستخدم
-    #     if not ou:
-    #         ou = self.env.user.default_ou_id
-
-    #     if ou:
-    #         vals['operation_unit_id'] = ou.id
-
-    #     return vals
  
     def _prepare_account_move_vals(self):
         vals = super()._prepare_account_move_vals()
@@ -142,12 +123,7 @@ class StockMove(models.Model):
             vals['operation_unit_id'] = ou.id
 
         return vals
-        # vals = super()._prepare_account_move_vals()
-        # ou = self._get_operation_unit_from_source()
-        # if ou:
-        #     vals['operation_unit_id'] = ou.id
-        # return vals
-
+        
     def _prepare_account_move_vals(self, acc_valuation,  acc_dest,  journal_id, qty,  description, svl_id,cost ):
         vals = super()._prepare_account_move_vals(
             acc_valuation,
