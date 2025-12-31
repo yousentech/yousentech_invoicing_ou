@@ -21,11 +21,16 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
+                    <widget name="web_ribbon" title="Inactive" bg_color="bg-danger" invisible="active == True"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" string="Active" class="oe_stat_button" icon="fa-bell">
+                            <field name="active"  widget="boolean_button"/>
+                        </button>
+                    </div>
                     <group>
                         <field name="name"/>
                         <field name="company_id"/>
-
-                        <field name="active"/>
+ 
                     </group>
                 </sheet>
             </form>
