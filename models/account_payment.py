@@ -10,6 +10,14 @@ class AccountPayment(models.Model):
         'operation.unit',
          
         copy=False   )
+
+    allowed_ou_domain = fields.Char(compute="get_allowed_ou_domain")
+
+    @api.depends('company_id','invoice_user_id')
+    def get_allowed_ou_domain(self):
+        for rec in self:
+            rec.allowed_ou_domain = [('id','in',self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == rec.company_id.id).allowed_ou_ids.ids)]
+
      
     @api.model
     def default_get(self, fields_list):
@@ -47,7 +55,7 @@ class AccountPayment(models.Model):
                 if ou:
                     rec.operation_unit_id = ou
 
-                    
+
     allow_modify_ou_flag = fields.Boolean(
         default=lambda self: self._default_allow_modify_ou_flag(),
         compute="_check_allow_modify_ou_flag",

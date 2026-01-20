@@ -16,11 +16,41 @@ class AccountMove(models.Model):
         for rec in self:
             rec.allowed_ou_domain = [('id','in',self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == rec.company_id.id).allowed_ou_ids.ids)]
 
-    @api.onchange("company_id", "invoice_user_id", "move_type", "invoice_date")
-    def set_default_journal_id(self):
-        res = super(AccountMove, self).set_default_journal_id()
+    @api.model
+    def default_get(self, fields_list):
+        res = super().default_get(fields_list)
+
+        company_id = res.get('company_id', self.env.company.id)
+
+        if not res.get('operation_unit_id'):
+            ou = self.env.user.ou_config_ids.filtered(
+                lambda x: x.company_id.id == company_id
+            ).default_ou_id
+
+            if ou:
+                res['operation_unit_id'] = ou.id
+
+        return res
+    
+    @api.onchange('company_id')
+    def _onchange_company_id_set_ou(self):
         for rec in self:
-            rec.operation_unit_id = self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == rec.company_id.id).default_ou_id.id
+            if not rec.company_id:
+                rec.operation_unit_id = False
+                return
+
+            # OU الحالي غير تابع للشركة
+            if rec.operation_unit_id and rec.operation_unit_id.company_id != rec.company_id:
+                rec.operation_unit_id = False
+
+            # تعيين OU افتراضي
+            if not rec.operation_unit_id:
+                ou = self.env.user.ou_config_ids.filtered(
+                    lambda x: x.company_id == rec.company_id
+                ).default_ou_id
+
+                if ou:
+                    rec.operation_unit_id = ou
 
     allow_modify_ou_flag = fields.Boolean(
         default=lambda self: self._default_allow_modify_ou_flag(),
@@ -129,6 +159,14 @@ class AccountMove(models.Model):
                 )
         return super().action_post()
 
+    @api.constrains('operation_unit_id', 'company_id')
+    def _check_ou_company(self):
+        for rec in self:
+            if rec.operation_unit_id and rec.company_id:
+                if rec.operation_unit_id.company_id != rec.company_id:
+                    raise ValidationError(
+                        "Operation Unit must belong to the selected company."
+                    )
  
 class AccountPaymentRegister(models.TransientModel):
     _inherit = "account.payment.register"
