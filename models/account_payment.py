@@ -8,9 +8,25 @@ class AccountPayment(models.Model):
 
     operation_unit_id = fields.Many2one(
         'operation.unit',
-     
-        copy=False
+        default=lambda self: self._default_ou(),
+        copy=False   )
+    
+    def _default_ou(self):
+        return self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == self.company_id.id).default_ou_id.id
+
+    allow_modify_ou_flag = fields.Boolean(
+        default=lambda self: self._default_allow_modify_ou_flag(),
+        compute="_check_allow_modify_ou_flag",
     )
+    def _default_allow_modify_ou_flag(self):
+        
+        return self.user_has_groups('yousentech_invoicing_ou.group_allow_modify_ou')
+
+    def _check_allow_modify_ou_flag(self):
+        
+        for rec in self:
+            rec.allow_modify_ou_flag = self.user_has_groups('yousentech_invoicing_ou.group_allow_modify_ou')
+
 
     @api.model
     def create(self, vals):
@@ -20,6 +36,7 @@ class AccountPayment(models.Model):
            
         return super().create(vals)
  
+   
    
     @api.constrains('operation_unit_id')
     def _check_ou_required(self):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'yousentech_invoicing_ou',
+    'name': 'group_allow_modify_ou',
 	'version': '17.0.1.0.0',
 	'summary': 'yousentech_invoicing_ou',
 	'category': 'Tools',
@@ -16,7 +16,7 @@
    
 
     # any module necessary for this one to work correctly
-    'depends': ['base','account'],
+    'depends': ['base','account','yousentech_invoicing'],
 
     # always loaded
     'data': [

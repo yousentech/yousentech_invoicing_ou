@@ -3,6 +3,11 @@
 	<data> 
 
        
+		<record id="group_allow_modify_ou" model="res.groups">
+		 
+			<field name="name">Allow modify Operating unit</field>
+			<field name="category_id" ref="yousentech_invoicing.invoice_category"/>
+		</record>
 
 		<record id="rule_account_move_ou" model="ir.rule">
 			<field name="name">account move OU Rule</field>
