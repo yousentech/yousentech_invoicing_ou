@@ -14,7 +14,7 @@ class AccountMove(models.Model):
 
     @api.onchange("company_id", "invoice_user_id", "move_type", "invoice_date")
     def set_default_journal_id(self):
-        res = super(account_move, self).set_default_journal_id()
+        res = super(AccountMove, self).set_default_journal_id()
         for rec in self:
             print("self.company_id.id",rec.company_id)
             rec.operation_unit_id = self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == rec.company_id.id).default_ou_id.id
