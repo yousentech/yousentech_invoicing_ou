@@ -8,11 +8,12 @@ class AccountMove(models.Model):
 
     operation_unit_id = fields.Many2one(
         'operation.unit',
-        default=lambda self: self._default_ou(),
+        
         copy=False )
 
+    @api.onchange("company_id", "invoice_user_id", "move_type")
     def _default_ou(self):
-        return self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == self.company_id.id).default_ou_id.id
+        self.operation_unit_id= self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == self.company_id.id).default_ou_id.id
 
     allow_modify_ou_flag = fields.Boolean(
         default=lambda self: self._default_allow_modify_ou_flag(),
