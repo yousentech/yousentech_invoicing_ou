@@ -11,10 +11,13 @@ class AccountMove(models.Model):
         default=lambda self: self._default_ou(),
         copy=False )
 
-    @api.model
-    def _default_ou(self):
-        print("self.company_id.id",self.company_id)
-        return self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == self.company_id.id).default_ou_id.id
+
+    @api.onchange("company_id", "invoice_user_id", "move_type", "invoice_date")
+    def set_default_journal_id(self):
+        res = super(account_move, self).set_default_journal_id()
+        for rec in self:
+            print("self.company_id.id",rec.company_id)
+            rec.operation_unit_id = self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == rec.company_id.id).default_ou_id.id
 
     allow_modify_ou_flag = fields.Boolean(
         default=lambda self: self._default_allow_modify_ou_flag(),
