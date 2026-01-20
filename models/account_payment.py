@@ -26,7 +26,28 @@ class AccountPayment(models.Model):
                 res['operation_unit_id'] = ou.id
 
         return res
+    
+    @api.onchange('company_id')
+    def _onchange_company_id_set_ou(self):
+        for rec in self:
+            if not rec.company_id:
+                rec.operation_unit_id = False
+                return
 
+            # OU الحالي غير تابع للشركة
+            if rec.operation_unit_id and rec.operation_unit_id.company_id != rec.company_id:
+                rec.operation_unit_id = False
+
+            # تعيين OU افتراضي
+            if not rec.operation_unit_id:
+                ou = self.env.user.ou_config_ids.filtered(
+                    lambda x: x.company_id == rec.company_id
+                ).default_ou_id
+
+                if ou:
+                    rec.operation_unit_id = ou
+
+                    
     allow_modify_ou_flag = fields.Boolean(
         default=lambda self: self._default_allow_modify_ou_flag(),
         compute="_check_allow_modify_ou_flag",
@@ -58,3 +79,13 @@ class AccountPayment(models.Model):
                 raise ValidationError(
                     'Operation Unit is required'
                 )
+ 
+    @api.constrains('operation_unit_id', 'company_id')
+    def _check_ou_company(self):
+        for rec in self:
+            if rec.operation_unit_id and rec.company_id:
+                if rec.operation_unit_id.company_id != rec.company_id:
+                    raise ValidationError(
+                        "Operation Unit must belong to the selected company."
+                    )
+
