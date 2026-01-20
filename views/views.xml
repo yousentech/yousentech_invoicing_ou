@@ -9,7 +9,7 @@
         <field name="arch" type="xml">
              
                 <xpath expr = "//group[@id = 'header_left_group']" position="inside">
-                    <field name="operation_unit_id" invisible="1"/>
+                    <field name="allow_modify_ou_flag" invisible="1"/>
                     <field name="operation_unit_id" force_save="1"  readonly="allow_modify_ou_flag" options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,'no_create': True}"/>
                 </xpath>
 
