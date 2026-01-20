@@ -8,11 +8,24 @@ class AccountPayment(models.Model):
 
     operation_unit_id = fields.Many2one(
         'operation.unit',
-        default=lambda self: self._default_ou(),
+         
         copy=False   )
-    
-    def _default_ou(self):
-        return self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == self.company_id.id).default_ou_id.id
+     
+    @api.model
+    def default_get(self, fields_list):
+        res = super().default_get(fields_list)
+
+        company_id = res.get('company_id', self.env.company.id)
+
+        if not res.get('operation_unit_id'):
+            ou = self.env.user.ou_config_ids.filtered(
+                lambda x: x.company_id.id == company_id
+            ).default_ou_id
+
+            if ou:
+                res['operation_unit_id'] = ou.id
+
+        return res
 
     allow_modify_ou_flag = fields.Boolean(
         default=lambda self: self._default_allow_modify_ou_flag(),
