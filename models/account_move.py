@@ -9,7 +9,7 @@ class AccountMove(models.Model):
     operation_unit_id = fields.Many2one(
         'operation.unit',copy=False )
 
-    allowed_ou_domain = self.fields.Char(compute="get_allowed_ou_domain")
+    allowed_ou_domain = fields.Char(compute="get_allowed_ou_domain")
 
     @api.depends('company_id','invoice_user_id')
     def get_allowed_ou_domain(self):
