@@ -13,6 +13,7 @@ class AccountMove(models.Model):
 
     @api.model
     def _default_ou(self):
+        print("self.company_id.id",self.company_id)
         return self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == self.company_id.id).default_ou_id.id
 
     allow_modify_ou_flag = fields.Boolean(
