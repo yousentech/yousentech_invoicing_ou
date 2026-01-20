@@ -8,7 +8,7 @@ class AccountMove(models.Model):
 
     operation_unit_id = fields.Many2one(
         'operation.unit',
-        default=lambda self: self._default_ou(),
+        
         copy=False )
 
 
