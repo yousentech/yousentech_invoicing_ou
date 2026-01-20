@@ -7,16 +7,19 @@ class AccountMove(models.Model):
     _inherit ='account.move'
 
     operation_unit_id = fields.Many2one(
-        'operation.unit',
-        
-        copy=False )
+        'operation.unit',copy=False )
 
+    allowed_ou_domain = self.fields.Char(compute="get_allowed_ou_domain")
+
+    @api.depends('company_id','invoice_user_id')
+    def get_allowed_ou_domain(self):
+        for rec in self:
+            rec.allowed_ou_domain = [('id','in',self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == rec.company_id.id).allowed_ou_ids.ids)]
 
     @api.onchange("company_id", "invoice_user_id", "move_type", "invoice_date")
     def set_default_journal_id(self):
         res = super(AccountMove, self).set_default_journal_id()
         for rec in self:
-            print("self.company_id.id",rec.company_id)
             rec.operation_unit_id = self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == rec.company_id.id).default_ou_id.id
 
     allow_modify_ou_flag = fields.Boolean(
