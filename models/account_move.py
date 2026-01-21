@@ -169,14 +169,7 @@ class AccountMove(models.Model):
                     )
  
  
-    def write(self, vals):
-        if 'operation_unit_id' in vals:
-            for move in self:
-                if move.payment_id:
-                    raise ValidationError(
-                        "Operation Unit must be changed from the Payment, not from the Journal Entry."
-                    )
-        return super().write(vals)
+    
  
 class AccountPaymentRegister(models.TransientModel):
     _inherit = "account.payment.register"
