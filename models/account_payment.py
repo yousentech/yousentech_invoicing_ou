@@ -72,13 +72,84 @@ class AccountPayment(models.Model):
 
     @api.model
     def create(self, vals):
-      
         if not vals.get('operation_unit_id'):
             vals['operation_unit_id'] = self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == vals.get('company_id')).default_ou_id.id
            
         return super().create(vals)
  
-   
+    def write(self, vals):
+        if 'operation_unit_id' in vals:
+            for payment in self:
+                move = payment.move_id
+                if not move:
+                    continue
+
+                reconciled_lines = move.line_ids.filtered(
+                    lambda l: l.account_id.reconcile and l.reconciled
+                )
+                if reconciled_lines:
+                    raise ValidationError(
+                        _("You cannot change Operation Unit on a reconciled payment.")
+                    )
+
+        res = super().write(vals)
+
+        # بعد الحفظ نزامن القيد
+        if 'operation_unit_id' in vals:
+            for payment in self:
+                if payment.move_id:
+                    payment.move_id.write({
+                        'operation_unit_id': payment.operation_unit_id.id
+                    })
+                    payment.move_id.line_ids.write({
+                        'operation_unit_id': payment.operation_unit_id.id
+                    })
+
+        return res
+
+    @api.onchange('operation_unit_id')
+    def _onchange_payment_ou_sync(self):
+        for payment in self:
+            if not payment.operation_unit_id or not payment.move_id:
+                continue
+
+            move = payment.move_id
+
+            # منع التغيير إذا كانت مُسوّاة
+            reconciled_lines = move.line_ids.filtered(
+                lambda l: l.account_id.reconcile and l.reconciled
+            )
+            if reconciled_lines:
+                raise ValidationError(
+                    _("You cannot change Operation Unit on a reconciled payment.")
+                )
+
+            # تحديث OU في القيد
+            move.operation_unit_id = payment.operation_unit_id
+
+            # تحديث OU في السطور
+            move.line_ids.write({
+                'operation_unit_id': payment.operation_unit_id.id
+            })
+    
+    
+    @api.constrains('operation_unit_id')
+    def _check_ou_change_after_reconcile(self):
+        for payment in self:
+            move = payment.move_id
+            if not move:
+                continue
+
+            reconciled_lines = move.line_ids.filtered(
+                lambda l: l.account_id.reconcile and l.reconciled
+            )
+
+            if reconciled_lines:
+                raise ValidationError(
+                    _("You cannot change Operation Unit on a reconciled payment.")
+                )
+
+
    
     @api.constrains('operation_unit_id')
     def _check_ou_required(self):
