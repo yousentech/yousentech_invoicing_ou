@@ -23,7 +23,8 @@ class AccountMove(models.Model):
                 [('name', '=', 'purchase_line_ids'), ('model', '=', 'account.move.line')])
             
             if is_exsiting_sale_field or is_exsiting_purchase_field:
-                move.from_sale_purchase_order =  True
+                move.from_sale_purchase_order = bool(move.invoice_line_ids.mapped('sale_line_ids.order_id'))
+                move.from_sale_purchase_order = bool(move.invoice_line_ids.mapped('purchase_line_ids.order_id'))
             else:
                 move.from_sale_purchase_order =  False
 
