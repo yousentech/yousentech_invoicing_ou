@@ -23,14 +23,20 @@ class AccountMove(models.Model):
                 [('name', '=', 'purchase_line_id'), ('model', '=', 'account.move.line')])
             is_exsiting_stock_field = self.env['ir.model.fields'].sudo().search(
                 [('name', '=', 'purchase_line_id'), ('model', '=', 'account.move.line')])
-            
+            from_sale_order=False
+            from_purch_order=False
+            from_stock_order=False
             if is_exsiting_sale_field:
-                move.from_other_order = bool(move.invoice_line_ids.mapped('sale_line_ids.order_id'))
-            if is_exsiting_purchase_field:
-                move.from_other_order = bool(move.invoice_line_ids.mapped('purchase_line_id.order_id'))
-            if is_exsiting_stock_field:
-               
-                move.from_other_order = bool(move.stock_valuation_layer_ids)
+                from_sale_order = bool(move.invoice_line_ids.mapped('sale_line_ids.order_id'))
+            elif is_exsiting_purchase_field:
+                from_purch_order = bool(move.invoice_line_ids.mapped('purchase_line_id.order_id'))
+            elif is_exsiting_stock_field:
+                from_stock_order = bool(move.stock_valuation_layer_ids)
+            
+            
+            if from_sale_order or from_purch_order or from_stock_order:
+                rec.from_other_order = True
+           
             else:
                 move.from_other_order =  False
 
