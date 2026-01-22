@@ -38,6 +38,10 @@ class AccountMove(models.Model):
                 from_stock_order = bool(move.stock_valuation_layer_ids)
                 print("from_stock_order",from_stock_order)
 
+            print("from_stock_order",from_stock_order)
+            print("from_purch_order",from_purch_order)
+            print("from_sale_order",from_sale_order)
+
             if from_sale_order or from_purch_order or from_stock_order:
                 rec.from_other_order = True
            
