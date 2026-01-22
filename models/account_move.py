@@ -28,12 +28,16 @@ class AccountMove(models.Model):
             from_stock_order=False
             if is_exsiting_sale_field:
                 from_sale_order = bool(move.invoice_line_ids.mapped('sale_line_ids.order_id'))
+                print("from_sale_order",from_sale_order)
+
             if is_exsiting_purchase_field:
                 from_purch_order = bool(move.invoice_line_ids.mapped('purchase_line_id.order_id'))
+                print("from_purch_order",from_purch_order)
+
             if is_exsiting_stock_field:
                 from_stock_order = bool(move.stock_valuation_layer_ids)
-            
-            
+                print("from_stock_order",from_stock_order)
+
             if from_sale_order or from_purch_order or from_stock_order:
                 rec.from_other_order = True
            
