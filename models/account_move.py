@@ -28,9 +28,9 @@ class AccountMove(models.Model):
             from_stock_order=False
             if is_exsiting_sale_field:
                 from_sale_order = bool(move.invoice_line_ids.mapped('sale_line_ids.order_id'))
-            elif is_exsiting_purchase_field:
+            if is_exsiting_purchase_field:
                 from_purch_order = bool(move.invoice_line_ids.mapped('purchase_line_id.order_id'))
-            elif is_exsiting_stock_field:
+            if is_exsiting_stock_field:
                 from_stock_order = bool(move.stock_valuation_layer_ids)
             
             
