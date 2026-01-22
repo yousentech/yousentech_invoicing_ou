@@ -42,7 +42,7 @@ class AccountMove(models.Model):
             print("from_sale_order",from_sale_order)
 
             if from_sale_order or from_purch_order or from_stock_order:
-                rec.from_other_order = True
+                move.from_other_order = True
            
             else:
                 move.from_other_order =  False
