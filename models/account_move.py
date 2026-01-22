@@ -9,24 +9,30 @@ class AccountMove(models.Model):
     operation_unit_id = fields.Many2one(
         'operation.unit',copy=False )
         
-    from_sale_purchase_order = fields.Boolean(
-        compute='_compute_from_sale_purchase_order',
+    from_other_order = fields.Boolean(
+        compute='_compute_from_other_order',
         store=True
     )
 
     @api.depends('invoice_line_ids')
-    def _compute_from_sale_purchase_order(self):
+    def _compute_from_other_order(self):
         for move in self:
             is_exsiting_sale_field = self.env['ir.model.fields'].sudo().search(
                 [('name', '=', 'sale_line_ids'), ('model', '=', 'account.move.line')])
             is_exsiting_purchase_field = self.env['ir.model.fields'].sudo().search(
-                [('name', '=', 'purchase_line_ids'), ('model', '=', 'account.move.line')])
+                [('name', '=', 'purchase_line_id'), ('model', '=', 'account.move.line')])
+            is_exsiting_stock_field = self.env['ir.model.fields'].sudo().search(
+                [('name', '=', 'purchase_line_id'), ('model', '=', 'account.move.line')])
             
-            if is_exsiting_sale_field or is_exsiting_purchase_field:
-                move.from_sale_purchase_order = bool(move.invoice_line_ids.mapped('sale_line_ids.order_id'))
-                move.from_sale_purchase_order = bool(move.invoice_line_ids.mapped('purchase_line_ids.order_id'))
+            if is_exsiting_sale_field:
+                move.from_other_order = bool(move.invoice_line_ids.mapped('sale_line_ids.order_id'))
+            if is_exsiting_purchase_field:
+                move.from_other_order = bool(move.invoice_line_ids.mapped('purchase_line_id.order_id'))
+            if is_exsiting_stock_field:
+               
+                move.from_other_order = bool(move.stock_valuation_layer_ids)
             else:
-                move.from_sale_purchase_order =  False
+                move.from_other_order =  False
 
 
 
