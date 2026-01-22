@@ -8,6 +8,26 @@ class AccountMove(models.Model):
 
     operation_unit_id = fields.Many2one(
         'operation.unit',copy=False )
+        
+    from_sale_purchase_order = fields.Boolean(
+        compute='_compute_from_sale_purchase_order',
+        store=True
+    )
+
+    @api.depends('invoice_line_ids')
+    def _compute_from_sale_purchase_order(self):
+        for move in self:
+            is_exsiting_sale_field = self.env['ir.model.fields'].sudo().search(
+                [('name', '=', 'sale_line_ids'), ('model', '=', 'account.move.line')])
+            is_exsiting_purchase_field = self.env['ir.model.fields'].sudo().search(
+                [('name', '=', 'purchase_line_ids'), ('model', '=', 'account.move.line')])
+            
+            if is_exsiting_sale_field or is_exsiting_purchase_field:
+                move.from_sale_purchase_order =  True
+            else:
+                move.from_sale_purchase_order =  False
+
+
 
     allowed_ou_domain = fields.Char(compute="get_allowed_ou_domain")
 
