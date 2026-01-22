@@ -14,7 +14,7 @@ class AccountMove(models.Model):
         store=True
     )
 
-    @api.depends('invoice_line_ids')
+    @api.depends('company_id')
     def _compute_from_other_order(self):
         for move in self:
             is_exsiting_sale_field = self.env['ir.model.fields'].sudo().search(
