@@ -209,13 +209,13 @@ class AccountMove(models.Model):
                     )
  
  
-    @api.constrains('operation_unit_id')
-    def _check_ou_change_after_reconcile(self):
-        for move in self:
-            if move.line_ids.filtered(lambda l: l.reconciled):
-                raise ValidationError(
-                    'You cannot change Operation Unit on reconciled entries.'
-                )
+    # @api.constrains('operation_unit_id')
+    # def _check_ou_change_after_reconcile(self):
+    #     for move in self:
+    #         if move.line_ids.filtered(lambda l: l.reconciled):
+    #             raise ValidationError(
+    #                 'You cannot change Operation Unit on reconciled entries.'
+    #             )
 
  
 class AccountPaymentRegister(models.TransientModel):
