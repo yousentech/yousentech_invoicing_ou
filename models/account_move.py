@@ -21,7 +21,7 @@ class AccountMove(models.Model):
             is_exsiting_purchase_field = self.env['ir.model.fields'].sudo().search(
                 [('name', '=', 'purchase_line_id'), ('model', '=', 'account.move.line')])
             is_exsiting_stock_field = self.env['ir.model.fields'].sudo().search(
-                [('name', '=', 'purchase_line_id'), ('model', '=', 'account.move.line')])
+                [('name', '=', 'stock_valuation_layer_ids'), ('model', '=', 'account.move.line')])
             from_sale_order=False
             from_purch_order=False
             from_stock_order=False
