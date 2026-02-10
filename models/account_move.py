@@ -37,9 +37,7 @@ class AccountMove(models.Model):
                 from_stock_order = bool(move.stock_valuation_layer_ids)
                 print("from_stock_order",from_stock_order)
 
-            print("from_stock_order",from_stock_order)
-            print("from_purch_order",from_purch_order)
-            print("from_sale_order",from_sale_order)
+         
 
             if from_sale_order or from_purch_order or from_stock_order:
                 move.from_other_order = True
@@ -124,12 +122,28 @@ class AccountMove(models.Model):
             if move.operation_unit_id:
                 ous |= move.operation_unit_id
 
+
+            is_exsiting_sale_field = self.env['ir.model.fields'].sudo().search(
+                [('name', '=', 'sale_line_ids'), ('model', '=', 'account.move.line')])
+            is_exsiting_purchase_field = self.env['ir.model.fields'].sudo().search(
+                [('name', '=', 'purchase_line_id'), ('model', '=', 'account.move.line')])
+            
             # 2️⃣ OU من سطور الفاتورة
             for line in move.invoice_line_ids:
                 if line.operation_unit_id:
                     ous |= line.operation_unit_id
  
+              
+                if is_exsiting_sale_field:
+                    ous |= line.sale_line_ids.mapped(
+                        'order_id.operation_unit_id'
+                    )
                 
+                if is_exsiting_purchase_field:
+                     ous |= line.purchase_line_id.order_id.operation_unit_id
+
+               
+
             ous = ous.filtered(lambda x: x)
 
             if len(ous) > 1:
