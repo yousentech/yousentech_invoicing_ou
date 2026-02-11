@@ -85,28 +85,12 @@ class AccountMove(models.Model):
             if move.operation_unit_id:
                 ous |= move.operation_unit_id
 
-
-            is_exsiting_sale_field = self.env['ir.model.fields'].sudo().search(
-                [('name', '=', 'sale_line_ids'), ('model', '=', 'account.move.line')])
-            is_exsiting_purchase_field = self.env['ir.model.fields'].sudo().search(
-                [('name', '=', 'purchase_line_id'), ('model', '=', 'account.move.line')])
-            
+ 
             # 2️⃣ OU من سطور الفاتورة
             for line in move.invoice_line_ids:
                 if line.operation_unit_id:
                     ous |= line.operation_unit_id
- 
-              
-                if is_exsiting_sale_field:
-                    ous |= line.sale_line_ids.mapped(
-                        'order_id.operation_unit_id'
-                    )
-                
-                if is_exsiting_purchase_field:
-                     ous |= line.purchase_line_id.order_id.operation_unit_id
-
-               
-
+  
             ous = ous.filtered(lambda x: x)
 
             if len(ous) > 1:
