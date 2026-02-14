@@ -234,8 +234,11 @@ class AccountMoveLine(models.Model):
                         'You cannot reconcile entries from different Operation Units.'
                     )
            
-            ous = rec.mapped('operation_unit_id').filtered(lambda x: x)
+            ous = self.mapped('operation_unit_id').filtered(lambda x: x)
             
             if len(ous) > 1:
+                raise ValidationError(
+                        'You cannot reconcile entries from different Operation Units.'
+                    )
                
         return super().reconcile()
