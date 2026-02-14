@@ -228,7 +228,7 @@ class AccountMoveLine(models.Model):
  
     def reconcile(self):
         for rec in self:
-            print("payment_id*********************",payment_id)
+            print("payment_id*********************",rec.payment_id)
             ous = rec.mapped('operation_unit_id').filtered(lambda x: x)
             
             if len(ous) > 1:
