@@ -158,6 +158,7 @@ class AccountMove(models.Model):
                 raise ValidationError(
                     'Operation Unit is required before posting the accounting entry.'
                 )
+            move._check_operation_unit_validity()
         return super().action_post()
 
     @api.constrains('operation_unit_id', 'company_id')
@@ -170,13 +171,13 @@ class AccountMove(models.Model):
                     )
  
  
-    # @api.constrains('operation_unit_id')
-    # def _check_ou_change_after_reconcile(self):
-    #     for move in self:
-    #         if move.line_ids.filtered(lambda l: l.reconciled):
-    #             raise ValidationError(
-    #                 'You cannot change Operation Unit on reconciled entries.'
-    #             )
+    @api.constrains('operation_unit_id')
+    def _check_ou_change_after_reconcile(self):
+        for move in self:
+            if move.line_ids.filtered(lambda l: l.reconciled):
+                raise ValidationError(
+                    'You cannot change Operation Unit on reconciled entries.'
+                )
 
  
 class AccountPaymentRegister(models.TransientModel):
@@ -190,14 +191,14 @@ class AccountPaymentRegister(models.TransientModel):
         copy=False )
 
     def _init_payments(self, to_process, edit_mode=False):
-        # 🔹 حقن OU في قيم الإنشاء
+    
         for vals in to_process:
             create_vals = vals.get('create_vals', {})
 
             if self.operation_unit_id:
                 create_vals['operation_unit_id'] = self.operation_unit_id.id
 
-        # 🔹 نكمل السلوك الأصلي
+       
         return super()._init_payments(to_process, edit_mode=edit_mode)
 
 
