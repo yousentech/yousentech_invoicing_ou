@@ -8,6 +8,18 @@ class AccountMove(models.Model):
 
     operation_unit_id = fields.Many2one(
         'operation.unit',copy=False )
+
+    
+    from_other_order = fields.Boolean(
+        compute='_compute_from_other_order',
+     )
+
+    @api.depends('invoice_line_ids')
+    def _compute_from_other_order(self):
+        for move in self:
+            
+            move.from_other_order =  False
+
         
    
     allowed_ou_domain = fields.Char(compute="get_allowed_ou_domain")
