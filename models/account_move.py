@@ -229,10 +229,10 @@ class AccountMoveLine(models.Model):
     def reconcile(self):
         for rec in self:
             print("payment_id*********************",rec.move_id.payment_id)
-            
+
             if not (rec.move_id.payment_id.operation_unit_id.id == rec.move_id.operation_unit_id.id):
                 raise ValidationError(
-                        'You cannot reconcile entries from different Operation Units.'
+                        'You cannot reconcile entries from different Operation Units.111'
                     )
            
             ous = self.mapped('operation_unit_id').filtered(lambda x: x)
