@@ -209,7 +209,7 @@ class AccountMove(models.Model):
                 ('parent_state', '=', 'posted'),
                 ('partner_id', '=', move.commercial_partner_id.id),
                 ('reconciled', '=', False),
-                ('move_id.operation_unit_id','=',move.operation_unit_id.id),
+                  '|',('move_id.operation_unit_id','=',move.operation_unit_id.id),('move_id.operation_unit_id','=',False),
                 '|', ('amount_residual', '!=', 0.0), ('amount_residual_currency', '!=', 0.0),
               
             ]
