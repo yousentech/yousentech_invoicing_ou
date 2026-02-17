@@ -190,29 +190,6 @@ class AccountMove(models.Model):
                 raise ValidationError(
                     'You cannot change Operation Unit on reconciled entries.'
                 )
-
- 
-class AccountPaymentRegister(models.TransientModel):
-    _inherit = "account.payment.register"
-
-    operation_unit_id = fields.Many2one(
-        'operation.unit',
-        string='Operation Unit',
-        readonly=True,
-        related='line_ids.move_id.operation_unit_id',
-        copy=False )
-
-    def _init_payments(self, to_process, edit_mode=False):
-    
-        for vals in to_process:
-            create_vals = vals.get('create_vals', {})
-
-            if self.operation_unit_id:
-                create_vals['operation_unit_id'] = self.operation_unit_id.id
-
-       
-        return super()._init_payments(to_process, edit_mode=edit_mode)
-
     
     def _compute_payments_widget_to_reconcile_info(self):
         for move in self:
@@ -226,13 +203,13 @@ class AccountPaymentRegister(models.TransientModel):
 
             pay_term_lines = move.line_ids\
                 .filtered(lambda line: line.account_id.account_type in ('asset_receivable', 'liability_payable'))
-
+           
             domain = [
                 ('account_id', 'in', pay_term_lines.account_id.ids),
                 ('parent_state', '=', 'posted'),
                 ('partner_id', '=', move.commercial_partner_id.id),
                 ('reconciled', '=', False),
-             
+                ('move_id.operation_unit_id','=',move.operation_unit_id.id),
                 '|', ('amount_residual', '!=', 0.0), ('amount_residual_currency', '!=', 0.0),
               
             ]
@@ -279,6 +256,30 @@ class AccountPaymentRegister(models.TransientModel):
             move.invoice_outstanding_credits_debits_widget = payments_widget_vals
             move.invoice_has_outstanding = True
 
+ 
+class AccountPaymentRegister(models.TransientModel):
+    _inherit = "account.payment.register"
+
+    operation_unit_id = fields.Many2one(
+        'operation.unit',
+        string='Operation Unit',
+        readonly=True,
+        related='line_ids.move_id.operation_unit_id',
+        copy=False )
+
+    def _init_payments(self, to_process, edit_mode=False):
+    
+        for vals in to_process:
+            create_vals = vals.get('create_vals', {})
+
+            if self.operation_unit_id:
+                create_vals['operation_unit_id'] = self.operation_unit_id.id
+
+       
+        return super()._init_payments(to_process, edit_mode=edit_mode)
+
+    
+  
 
 
 
