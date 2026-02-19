@@ -300,7 +300,9 @@ class AccountMoveLine(models.Model):
             moves = self.mapped('move_id')
             invoice_ous = moves.filtered(lambda m: m.move_type in ['out_invoice','in_invoice']).mapped('operation_unit_id')
             payment_ous = moves.filtered(lambda m: m.payment_id).mapped('operation_unit_id')
-
+            print("moves*********************",moves)
+            print("payment_ous*********************",payment_ous)
+            print("invoice_ous*********************",invoice_ous)
             if invoice_ous and payment_ous and invoice_ous != payment_ous:
                 raise ValidationError('Invoice and Payment must belong to same Operation Unit.')
 
