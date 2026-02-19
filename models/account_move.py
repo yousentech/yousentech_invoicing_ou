@@ -203,13 +203,17 @@ class AccountMove(models.Model):
 
             pay_term_lines = move.line_ids\
                 .filtered(lambda line: line.account_id.account_type in ('asset_receivable', 'liability_payable'))
-           
+            ou_list =[]
+            ou_list.append(move.operation_unit_id.id)
+            for ou_id in self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == move.company_id.id).allowed_ou_ids.filtered(lambda x: x.share_ou).ids
+                ou_list.append(ou_id)
+
             domain = [
                 ('account_id', 'in', pay_term_lines.account_id.ids),
                 ('parent_state', '=', 'posted'),
                 ('partner_id', '=', move.commercial_partner_id.id),
                 ('reconciled', '=', False),
-                 '|', '|',('move_id.operation_unit_id','=',move.operation_unit_id.id),('move_id.operation_unit_id','=',False),('move_id.operation_unit_id.share_ou','=',True),
+                 '|', ('move_id.operation_unit_id','in',ou_list),('move_id.operation_unit_id','=',False) ,
                 '|', ('amount_residual', '!=', 0.0), ('amount_residual_currency', '!=', 0.0),
               
             ]
