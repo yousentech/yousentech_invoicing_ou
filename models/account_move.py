@@ -301,13 +301,14 @@ class AccountMoveLine(models.Model):
  
     def reconcile(self):
         for rec in self:
-            print("payment_id*********************",rec.payment_id)
-            print("payment_id move_id*********************",rec.move_id)
-
-            print("payment_id********operation_unit_id*************",rec.payment_id.operation_unit_id.id)
-            print("payment_id move_id*********operation_unit_id************",rec.move_id.operation_unit_id.id)
-
+          
             if rec.payment_id:
+                print("payment_id*********************",rec.payment_id)
+                print("payment_id move_id*********************",rec.move_id)
+
+                print("payment_id********operation_unit_id*************",rec.payment_id.operation_unit_id.id)
+                print("payment_id move_id*********operation_unit_id************",rec.move_id.operation_unit_id.id)
+
                 if not (rec.payment_id.operation_unit_id.id == rec.move_id.operation_unit_id.id):
                     raise ValidationError(
                             'You cannot reconcile entries from different Operation Units.111'
