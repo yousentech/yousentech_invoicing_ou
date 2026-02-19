@@ -29,6 +29,8 @@
                     </div>
                     <group>
                         <field name="name"/>
+                        <field name="share_ou"/>
+
                         <field name="company_id"/>
  
                     </group>

@@ -13,4 +13,5 @@ class OperationUnit(models.Model):
         required=True,
         default=lambda self: self.env.company
     )
+    share_ou = fields.Boolean(string="OU share",default=False)
     active = fields.Boolean(default=True)
