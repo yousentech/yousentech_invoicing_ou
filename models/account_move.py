@@ -311,7 +311,7 @@ class AccountMoveLine(models.Model):
            
             ous = self.mapped('operation_unit_id').filtered(lambda x: x)
             print("ous*********************",ous)
-            if len(ous) > 1:
+            if len(ous.filtered(lambda x: not x.share_ou)) > 1:
                 raise ValidationError(
                         'You cannot reconcile entries from different Operation Units.'
                     )
