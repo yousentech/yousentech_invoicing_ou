@@ -316,10 +316,7 @@ class AccountMoveLine(models.Model):
             payment_ous = moves.filtered(
                 lambda m: m.payment_id
             ).mapped('operation_unit_id')
-
-            # إزالة share_ou
-            invoice_ous = invoice_ous.filtered()
-            payment_ous = payment_ous.filtered()
+ 
 
             # 1️⃣ إذا في فاتورة فيها OU والدفعة بدون OU → منع
             if invoice_ous and not payment_ous:
