@@ -307,7 +307,7 @@ class AccountMoveLine(models.Model):
                 print("payment_id move_id*********************",rec.move_id)
 
                 print("payment_id********operation_unit_id*************",rec.payment_id.operation_unit_id.id)
-                print("payment_id move_id*********operation_unit_id************",rec.move_id.operation_unit_id.id)
+                print("payment_id move_id*********operation_unit_id************",self._context.get('active_id'))
 
                 if not (rec.payment_id.operation_unit_id.id == rec.move_id.operation_unit_id.id):
                     raise ValidationError(
