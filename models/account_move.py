@@ -307,17 +307,17 @@ class AccountMoveLine(models.Model):
             print("payment_id********operation_unit_id*************",rec.payment_id.operation_unit_id.id)
             print("payment_id move_id*********operation_unit_id************",rec.move_id.operation_unit_id.id)
 
-
-            if not (rec.payment_id.operation_unit_id.id == rec.move_id.operation_unit_id.id):
-                raise ValidationError(
-                        'You cannot reconcile entries from different Operation Units.111'
-                    )
-           
-            ous = self.mapped('operation_unit_id').filtered(lambda x: x)
-            print("ous*********************",ous)
-            if len(ous.filtered(lambda x: not x.share_ou)) > 1:
-                raise ValidationError(
-                        'You cannot reconcile entries from different Operation Units.'
-                    )
-               
+            if rec.payment_id:
+                if not (rec.payment_id.operation_unit_id.id == rec.move_id.operation_unit_id.id):
+                    raise ValidationError(
+                            'You cannot reconcile entries from different Operation Units.111'
+                        )
+            
+                ous = self.mapped('operation_unit_id').filtered(lambda x: x)
+                print("ous*********************",ous.filtered(lambda x: not x.share_ou))
+                if len(ous.filtered(lambda x: not x.share_ou)) > 1:
+                    raise ValidationError(
+                            'You cannot reconcile entries from different Operation Units.'
+                        )
+                
         return super().reconcile()
