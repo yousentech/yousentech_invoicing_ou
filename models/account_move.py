@@ -304,7 +304,7 @@ class AccountMoveLine(models.Model):
             print("payment_id*********************",rec.move_id.payment_id)
             print("payment_id move_id*********************",rec.move_id)
            
-            if not (rec.move_id.payment_id.operation_unit_id.id == rec.move_id.operation_unit_id.id):
+            if not (rec.move_id.payment_id.operation_unit_id.id == rec.move_id.operation_unit_id.id) and rec.move_id.payment_id:
                 raise ValidationError(
                         'You cannot reconcile entries from different Operation Units.111'
                     )
