@@ -307,27 +307,38 @@ class AccountMoveLine(models.Model):
             #     raise ValidationError('Invoice and Payment must belong to same Operation Unit.')
    
         # اجلب كل الـ OU المرتبطة بالقيود
-            ous = self.mapped('move_id.operation_unit_id')
+            moves = self.mapped('move_id')
 
-            # إذا يوجد أي OU فارغ
-            if any(not ou for ou in ous):
-                # وإذا يوجد OU غير فارغ أيضاً
-                if any(ou for ou in ous):
-                    raise ValidationError(
-                        'You cannot reconcile entries when one of them has no Operation Unit.'
-                    )
+            invoice_ous = moves.filtered(
+                lambda m: m.move_type in ['out_invoice', 'in_invoice']
+            ).mapped('operation_unit_id')
 
-            # استبعد share_ou
-            ous = ous.filtered(lambda x: not x.share_ou)
+            payment_ous = moves.filtered(
+                lambda m: m.payment_id
+            ).mapped('operation_unit_id')
 
-            # إذا أكثر من OU مختلف
-            if len(ous) > 1:
+            # إزالة share_ou
+            invoice_ous = invoice_ous.filtered(lambda x: not x.share_ou)
+            payment_ous = payment_ous.filtered(lambda x: not x.share_ou)
+
+            # 1️⃣ إذا في فاتورة فيها OU والدفعة بدون OU → منع
+            if invoice_ous and not payment_ous:
                 raise ValidationError(
-                    'You cannot reconcile entries from different Operation Units.'
+                    'Payment has no Operation Unit while Invoice has one.'
                 )
 
+            # 2️⃣ إذا في دفعة فيها OU والفاتورة بدون OU → منع
+            if payment_ous and not invoice_ous:
+                raise ValidationError(
+                    'Invoice has no Operation Unit while Payment has one.'
+                )
 
-        return super().reconcile()
+            # 3️⃣ إذا الاثنين موجودين لكن مختلفين → منع
+            if invoice_ous and payment_ous and invoice_ous != payment_ous:
+                raise ValidationError(
+                    'Invoice and Payment must belong to the same Operation Unit.'
+                )
+
           
             # if rec.payment_id:
             #     print("payment_id*********************",rec.payment_id)
