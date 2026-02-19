@@ -303,6 +303,11 @@ class AccountMoveLine(models.Model):
         for rec in self:
             print("payment_id*********************",rec.move_id.payment_id)
             print("payment_id move_id*********************",rec.move_id)
+
+            print("payment_id********operation_unit_id*************",rec.move_id.payment_id.operation_unit_id.id)
+            print("payment_id move_id*********operation_unit_id************",rec.move_id.operation_unit_id.id)
+
+
             if rec.move_id.payment_id:
                 if not (rec.move_id.payment_id.operation_unit_id.id == rec.move_id.operation_unit_id.id):
                     raise ValidationError(
