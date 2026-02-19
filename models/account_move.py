@@ -307,16 +307,25 @@ class AccountMoveLine(models.Model):
             #     raise ValidationError('Invoice and Payment must belong to same Operation Unit.')
    
         # اجلب كل الـ OU المرتبطة بالقيود
-            ous = self.mapped('move_id.operation_unit_id').filtered(lambda x: x)
+            ous = self.mapped('move_id.operation_unit_id')
 
-            # استبعد الـ OU التي share_ou = True
+            # إذا يوجد أي OU فارغ
+            if any(not ou for ou in ous):
+                # وإذا يوجد OU غير فارغ أيضاً
+                if any(ou for ou in ous):
+                    raise ValidationError(
+                        'You cannot reconcile entries when one of them has no Operation Unit.'
+                    )
+
+            # استبعد share_ou
             ous = ous.filtered(lambda x: not x.share_ou)
 
-            # إذا وجد أكثر من OU مختلف → امنع المطابقة
+            # إذا أكثر من OU مختلف
             if len(ous) > 1:
                 raise ValidationError(
                     'You cannot reconcile entries from different Operation Units.'
                 )
+
 
         return super().reconcile()
           
