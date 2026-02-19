@@ -297,15 +297,28 @@ class AccountMoveLine(models.Model):
     def reconcile(self):
         for rec in self:
 
-            moves = self.mapped('move_id')
-            invoice_ous = moves.filtered(lambda m: m.move_type in ['out_invoice','in_invoice']).mapped('operation_unit_id')
-            payment_ous = moves.filtered(lambda m: m.payment_id).mapped('operation_unit_id')
-            print("moves*********************",moves)
-            print("payment_ous*********************",payment_ous)
-            print("invoice_ous*********************",invoice_ous)
-            if invoice_ous and payment_ous and invoice_ous != payment_ous:
-                raise ValidationError('Invoice and Payment must belong to same Operation Unit.')
+            # moves = self.mapped('move_id')
+            # invoice_ous = moves.filtered(lambda m: m.move_type in ['out_invoice','in_invoice']).mapped('operation_unit_id')
+            # payment_ous = moves.filtered(lambda m: m.payment_id).mapped('operation_unit_id')
+            # print("moves*********************",moves)
+            # print("payment_ous*********************",payment_ous)
+            # print("invoice_ous*********************",invoice_ous)
+            # if invoice_ous and payment_ous and invoice_ous.id != payment_ous:
+            #     raise ValidationError('Invoice and Payment must belong to same Operation Unit.')
+   
+        # اجلب كل الـ OU المرتبطة بالقيود
+            ous = self.mapped('move_id.operation_unit_id').filtered(lambda x: x)
 
+            # استبعد الـ OU التي share_ou = True
+            ous = ous.filtered(lambda x: not x.share_ou)
+
+            # إذا وجد أكثر من OU مختلف → امنع المطابقة
+            if len(ous) > 1:
+                raise ValidationError(
+                    'You cannot reconcile entries from different Operation Units.'
+                )
+
+        return super().reconcile()
           
             # if rec.payment_id:
             #     print("payment_id*********************",rec.payment_id)
