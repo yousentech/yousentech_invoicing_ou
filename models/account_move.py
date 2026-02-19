@@ -282,11 +282,6 @@ class AccountPaymentRegister(models.TransientModel):
        
         return super()._init_payments(to_process, edit_mode=edit_mode)
 
-    
-  
-
-
-
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line' 
 
@@ -301,24 +296,32 @@ class AccountMoveLine(models.Model):
  
     def reconcile(self):
         for rec in self:
+
+            moves = self.mapped('move_id')
+            invoice_ous = moves.filtered(lambda m: m.move_type in ['out_invoice','in_invoice']).mapped('operation_unit_id')
+            payment_ous = moves.filtered(lambda m: m.payment_id).mapped('operation_unit_id')
+
+            if invoice_ous and payment_ous and invoice_ous != payment_ous:
+                raise ValidationError('Invoice and Payment must belong to same Operation Unit.')
+
           
-            if rec.payment_id:
-                print("payment_id*********************",rec.payment_id)
-                print("payment_id move_id*********************",rec.move_id)
+            # if rec.payment_id:
+            #     print("payment_id*********************",rec.payment_id)
+            #     print("payment_id move_id*********************",rec.move_id)
 
-                print("payment_id********operation_unit_id*************",rec.payment_id.operation_unit_id.id)
-                print("_context.get('active_id')*********operation_unit_id************",self._context.get('active_id'))
+            #     print("payment_id********operation_unit_id*************",rec.payment_id.operation_unit_id.id)
+            #     print("_context.get('active_id')*********operation_unit_id************",self._context.get('active_id'))
 
-                if not (rec.payment_id.operation_unit_id.id == rec.move_id.operation_unit_id.id):
-                    raise ValidationError(
-                            'You cannot reconcile entries from different Operation Units.111'
-                        )
+            #     if not (rec.payment_id.operation_unit_id.id == rec.move_id.operation_unit_id.id):
+            #         raise ValidationError(
+            #                 'You cannot reconcile entries from different Operation Units.111'
+            #             )
             
-                ous = self.mapped('operation_unit_id').filtered(lambda x: x)
-                print("ous*********************",ous.filtered(lambda x: not x.share_ou))
-                if len(ous.filtered(lambda x: not x.share_ou)) > 1:
-                    raise ValidationError(
-                            'You cannot reconcile entries from different Operation Units.'
-                        )
+            #     ous = self.mapped('operation_unit_id').filtered(lambda x: x)
+            #     print("ous*********************",ous.filtered(lambda x: not x.share_ou))
+            #     if len(ous.filtered(lambda x: not x.share_ou)) > 1:
+            #         raise ValidationError(
+            #                 'You cannot reconcile entries from different Operation Units.'
+            #             )
                 
         return super().reconcile()
