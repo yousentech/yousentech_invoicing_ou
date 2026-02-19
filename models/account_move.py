@@ -318,8 +318,8 @@ class AccountMoveLine(models.Model):
             ).mapped('operation_unit_id')
 
             # إزالة share_ou
-            invoice_ous = invoice_ous.filtered(lambda x: not x.share_ou)
-            payment_ous = payment_ous.filtered(lambda x: not x.share_ou)
+            invoice_ous = invoice_ous.filtered()
+            payment_ous = payment_ous.filtered()
 
             # 1️⃣ إذا في فاتورة فيها OU والدفعة بدون OU → منع
             if invoice_ous and not payment_ous:
@@ -334,7 +334,7 @@ class AccountMoveLine(models.Model):
                 )
 
             # 3️⃣ إذا الاثنين موجودين لكن مختلفين → منع
-            if invoice_ous and payment_ous and invoice_ous != payment_ous:
+            if invoice_ous and payment_ous and invoice_ous != payment_ous and not payment_ous.share_ou :
                 raise ValidationError(
                     'Invoice and Payment must belong to the same Operation Unit.'
                 )
