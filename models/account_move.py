@@ -84,6 +84,7 @@ class AccountMove(models.Model):
        
         if not vals.get('operation_unit_id'):
             print('*****************default_ou_id************************',self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == vals.get('company_id')).default_ou_id.id)
+            print('***************** vals.get('company_id')************************', vals.get('company_id') )
             vals['operation_unit_id'] =  self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == vals.get('company_id')).default_ou_id.id
 
         return super().create(vals)
