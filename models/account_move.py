@@ -147,6 +147,7 @@ class AccountMove(models.Model):
     @api.constrains('operation_unit_id', 'company_id')
     def _check_operation_unit_validity(self):
         for move in self:
+            move._onchange_company_id_set_ou()
             ou = move.operation_unit_id
             user = self.env.user
 
