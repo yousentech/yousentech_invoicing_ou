@@ -151,7 +151,7 @@ class AccountMove(models.Model):
             user = self.env.user
 
             if not ou:
-                raise ValidationError("Operation Unit is required on this document.")
+                raise ValidationError("Operation Unit is required on this document_invoice.")
  
             if ou.company_id != move.company_id:
                 raise ValidationError(
@@ -297,16 +297,7 @@ class AccountMoveLine(models.Model):
     def reconcile(self):
         for rec in self:
 
-            # moves = self.mapped('move_id')
-            # invoice_ous = moves.filtered(lambda m: m.move_type in ['out_invoice','in_invoice']).mapped('operation_unit_id')
-            # payment_ous = moves.filtered(lambda m: m.payment_id).mapped('operation_unit_id')
-            # print("moves*********************",moves)
-            # print("payment_ous*********************",payment_ous)
-            # print("invoice_ous*********************",invoice_ous)
-            # if invoice_ous and payment_ous and invoice_ous.id != payment_ous:
-            #     raise ValidationError('Invoice and Payment must belong to same Operation Unit.')
-   
-        # اجلب كل الـ OU المرتبطة بالقيود
+         
             moves = self.mapped('move_id')
 
             invoice_ous = moves.filtered(
@@ -315,45 +306,21 @@ class AccountMoveLine(models.Model):
 
             payment_ous = moves.filtered(
                 lambda m: m.payment_id
-            ).mapped('operation_unit_id')
- 
-
-            # 1️⃣ إذا في فاتورة فيها OU والدفعة بدون OU → منع
+            ).mapped('operation_unit_id') 
             if invoice_ous and not payment_ous:
                 raise ValidationError(
                     'Payment has no Operation Unit while Invoice has one.'
                 )
-
-            # 2️⃣ إذا في دفعة فيها OU والفاتورة بدون OU → منع
+ 
             if payment_ous and not invoice_ous:
                 raise ValidationError(
                     'Invoice has no Operation Unit while Payment has one.'
                 )
-
-            # 3️⃣ إذا الاثنين موجودين لكن مختلفين → منع
+ 
             if invoice_ous and payment_ous and invoice_ous != payment_ous and not payment_ous.share_ou :
                 raise ValidationError(
                     'Invoice and Payment must belong to the same Operation Unit.'
                 )
-
-          
-            # if rec.payment_id:
-            #     print("payment_id*********************",rec.payment_id)
-            #     print("payment_id move_id*********************",rec.move_id)
-
-            #     print("payment_id********operation_unit_id*************",rec.payment_id.operation_unit_id.id)
-            #     print("_context.get('active_id')*********operation_unit_id************",self._context.get('active_id'))
-
-            #     if not (rec.payment_id.operation_unit_id.id == rec.move_id.operation_unit_id.id):
-            #         raise ValidationError(
-            #                 'You cannot reconcile entries from different Operation Units.111'
-            #             )
-            
-            #     ous = self.mapped('operation_unit_id').filtered(lambda x: x)
-            #     print("ous*********************",ous.filtered(lambda x: not x.share_ou))
-            #     if len(ous.filtered(lambda x: not x.share_ou)) > 1:
-            #         raise ValidationError(
-            #                 'You cannot reconcile entries from different Operation Units.'
-            #             )
+ 
                 
         return super().reconcile()
