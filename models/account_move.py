@@ -83,8 +83,7 @@ class AccountMove(models.Model):
     def create(self, vals):
        
         if not vals.get('operation_unit_id'):
-            print('*****************default_ou_id************************',self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == vals.get('company_id')).default_ou_id.id)
-            print('*****************  company_id ***********************', vals.get('company_id') )
+            
             vals['operation_unit_id'] =  self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == vals.get('company_id')).default_ou_id.id
 
         return super().create(vals)
@@ -149,12 +148,11 @@ class AccountMove(models.Model):
     @api.constrains('operation_unit_id', 'company_id')
     def _check_operation_unit_validity(self):
         for move in self:
-            move._onchange_company_id_set_ou()
             ou = move.operation_unit_id
             user = self.env.user
 
             if not ou:
-                raise ValidationError("Operation Unit is required on this document_invoice.")
+                raise ValidationError("Operation Unit is required on this document_invoice for company [ %s ]." % (move.company_id.name))
  
             if ou.company_id != move.company_id:
                 raise ValidationError(
