@@ -85,9 +85,10 @@ class AccountMove(models.Model):
         if not vals.get('operation_unit_id'):
             
             vals['operation_unit_id'] =  self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == vals.get('company_id')).default_ou_id.id
-
-        return super().create(vals)
- 
+        
+        res= super().create(vals)
+        self._check_operation_unit_validity()
+        return res
    
     @api.constrains('invoice_line_ids', 'operation_unit_id')
     def _check_single_ou(self):
@@ -145,7 +146,7 @@ class AccountMove(models.Model):
         result['content'] = filtered_content
         return result
      
-    @api.constrains('operation_unit_id', 'company_id')
+    # @api.constrains('operation_unit_id', 'company_id')
     def _check_operation_unit_validity(self):
         for move in self:
             ou = move.operation_unit_id
