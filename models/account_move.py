@@ -90,6 +90,11 @@ class AccountMove(models.Model):
         self._check_operation_unit_validity()
         return res
    
+    def write(self, vals):
+        res = super().write(vals)
+        self._check_operation_unit_validity()
+        return res
+
     @api.constrains('invoice_line_ids', 'operation_unit_id')
     def _check_single_ou(self):
         for move in self:
