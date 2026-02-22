@@ -113,13 +113,13 @@ class AccountMove(models.Model):
                 )
 
                 
-    @api.constrains('operation_unit_id')
-    def _check_ou_required(self):
-        for rec in self:
-            if not rec.operation_unit_id:
-                raise ValidationError(
-                    'move Operation Unit is required'
-                )
+    # @api.constrains('operation_unit_id')
+    # def _check_ou_required(self):
+    #     for rec in self:
+    #         if not rec.operation_unit_id:
+    #             raise ValidationError(
+    #                 'move Operation Unit is required'
+    #             )
  
     def _get_outstanding_info_JSON(self):
         self.ensure_one()
