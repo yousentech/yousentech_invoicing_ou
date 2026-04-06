@@ -95,6 +95,8 @@ class AccountMove(models.Model):
     #     self._check_operation_unit_validity()
     #     return res
 
+   
+
     @api.constrains('invoice_line_ids', 'operation_unit_id')
     def _check_single_ou(self):
         for move in self:
@@ -300,34 +302,92 @@ class AccountMoveLine(models.Model):
         store=True,
         copy=False
     )
- 
     def reconcile(self):
-        for rec in self:
+        moves = self.mapped('move_id')
 
-         
-            moves = self.mapped('move_id')
+        invoice_ous = moves.filtered(
+            lambda m: m.move_type in ['out_invoice', 'in_invoice']
+        ).mapped('operation_unit_id')
 
-            invoice_ous = moves.filtered(
-                lambda m: m.move_type in ['out_invoice', 'in_invoice']
-            ).mapped('operation_unit_id')
+        payment_ous = moves.filtered(
+            lambda m: m.payment_id
+        ).mapped('operation_unit_id')
 
-            payment_ous = moves.filtered(
-                lambda m: m.payment_id
-            ).mapped('operation_unit_id') 
-            if invoice_ous and not payment_ous:
+        refund_ous = moves.filtered(
+            lambda m: m.move_type in ['out_refund', 'in_refund']
+        ).mapped('operation_unit_id')
+
+        # إزالة share_ou
+        invoice_ous = invoice_ous.filtered(lambda x: not x.share_ou)
+        payment_ous = payment_ous.filtered(lambda x: not x.share_ou)
+        refund_ous = refund_ous.filtered(lambda x: not x.share_ou)
+
+        # 🟢 دمج الفاتورة + المرتجع (نفس المعاملة)
+        invoice_and_refund_ous = (invoice_ous | refund_ous)
+
+        # ❌ إذا فيه OU في الفاتورة/المرتجع والدفعة بدون OU
+        if invoice_and_refund_ous and not payment_ous:
+            # 👈 اسمح لو العملية فقط بين فاتورة ومرتجع
+            if not refund_ous:
                 raise ValidationError(
                     'Payment has no Operation Unit while Invoice has one.'
                 )
- 
-            if payment_ous and not invoice_ous:
-                raise ValidationError(
-                    'Invoice has no Operation Unit while Payment has one.'
-                )
- 
-            if invoice_ous and payment_ous and invoice_ous != payment_ous and not payment_ous.share_ou :
+
+        # ❌ إذا فيه دفعة فيها OU والفاتورة/المرتجع بدون
+        if payment_ous and not invoice_and_refund_ous:
+            raise ValidationError(
+                'Invoice has no Operation Unit while Payment has one.'
+            )
+
+        # ❌ اختلاف OU بين الفاتورة/المرتجع والدفعه
+        if invoice_and_refund_ous and payment_ous:
+            if invoice_and_refund_ous != payment_ous:
                 raise ValidationError(
                     'Invoice and Payment must belong to the same Operation Unit.'
                 )
+
+    return super().reconcile()
+
+    # def reconcile(self):
+    #     for rec in self:
+    #         moves = self.mapped('move_id')
+
+    #         invoice_ous = moves.filtered(
+    #             lambda m: m.move_type in ['out_invoice', 'in_invoice']
+    #         ).mapped('operation_unit_id')
+
+    #         payment_ous = moves.filtered(
+    #             lambda m: m.payment_id
+    #         ).mapped('operation_unit_id') 
+            
+    #         refund_ous = moves.filtered(
+    #             lambda m: m.move_type in ['out_refund', 'in_refund']
+    #         ).mapped('operation_unit_id')
+    #         if invoice_ous and not (payment_ous or refund_ous):
+    #             raise ValidationError(
+    #                 'Payment has no Operation Unit while Invoice has one.'
+    #             )
+ 
+    #         if (payment_ous or refund_ous) and not invoice_ous:
+    #             raise ValidationError(
+    #                 'Invoice has no Operation Unit while Payment has one.'
+    #             )
+ 
+    #         if invoice_ous and (payment_ous or refund_ous) and invoice_ous != (payment_ous or refund_ous) and not payment_ous.share_ou :
+    #             raise ValidationError(
+    #                 'Invoice and Payment must belong to the same Operation Unit.'
+    #             )
  
                 
-        return super().reconcile()
+    #     return super().reconcile()
+class AccountMoveReversal(models.TransientModel):
+    _inherit = 'account.move.reversal'
+
+    def _prepare_default_reversal(self, move):
+        vals = super()._prepare_default_reversal(move)
+
+        # ✅ نقل OU من الفاتورة الأصلية
+        if move.operation_unit_id:
+            vals['operation_unit_id'] = move.operation_unit_id.id
+
+        return vals
