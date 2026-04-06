@@ -7,7 +7,7 @@ class AccountMove(models.Model):
     _inherit ='account.move'
 
     operation_unit_id = fields.Many2one(
-        'operation.unit',copy=False )
+        'operation.unit',copy=False,domain=[('share_ou','=',False)] )
 
     
     from_other_order = fields.Boolean(
@@ -302,48 +302,7 @@ class AccountMoveLine(models.Model):
         store=True,
         copy=False
     )
-    # def reconcile(self):
-    #     moves = self.mapped('move_id')
-
-    #     # تحديد الأنواع
-    #     invoices = moves.filtered(lambda m: m.move_type in ['out_invoice', 'in_invoice'])
-    #     refunds = moves.filtered(lambda m: m.move_type in ['out_refund', 'in_refund'])
-    #     payments = moves.filtered(lambda m: m.payment_id)
-
-    #     # كل الـ OU
-    #     ous = moves.mapped('operation_unit_id')
-
-    #     # إزالة الفارغ
-    #     ous_not_null = ous.filtered(lambda x: x)
-
-    #     # 🔴 إذا في OU فاضي مع OU موجود → منع
-    #     if ous_not_null and len(ous_not_null) != len(moves):
-    #         raise ValidationError(
-    #             'All entries must have an Operation Unit.'
-    #         )
-
-    #     # 🟢 حالة خاصة: فاتورة + مرتجع فقط
-    #     if invoices and refunds and not payments:
-    #         # لازم نفس OU
-    #         if len(ous_not_null) > 1:
-    #             raise ValidationError(
-    #                 'Invoice and Refund must have the same Operation Unit.'
-    #             )
-    #         return super().reconcile()
-
-    #     # 🟢 إذا كلها نفس OU → عادي
-    #     if len(ous_not_null) <= 1:
-    #         return super().reconcile()
-
-    #     # 🟢 إذا فيه OU فيها share_ou → نسمح
-    #     if any(ou.share_ou for ou in ous_not_null):
-    #         return super().reconcile()
-
-    #     # ❌ غير ذلك → منع
-    #     raise ValidationError(
-    #         'You cannot reconcile entries from different Operation Units unless one of them is shared.'
-    #     )
-
+    
     def reconcile(self):
         for rec in self:
             moves = self.mapped('move_id')
