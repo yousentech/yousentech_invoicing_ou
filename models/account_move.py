@@ -305,48 +305,44 @@ class AccountMoveLine(models.Model):
     def reconcile(self):
         moves = self.mapped('move_id')
 
-        invoice_ous = moves.filtered(
-            lambda m: m.move_type in ['out_invoice', 'in_invoice']
-        ).mapped('operation_unit_id')
+        # تحديد الأنواع
+        invoices = moves.filtered(lambda m: m.move_type in ['out_invoice', 'in_invoice'])
+        refunds = moves.filtered(lambda m: m.move_type in ['out_refund', 'in_refund'])
+        payments = moves.filtered(lambda m: m.payment_id)
 
-        payment_ous = moves.filtered(
-            lambda m: m.payment_id
-        ).mapped('operation_unit_id')
+        # كل الـ OU
+        ous = moves.mapped('operation_unit_id')
 
-        refund_ous = moves.filtered(
-            lambda m: m.move_type in ['out_refund', 'in_refund']
-        ).mapped('operation_unit_id')
+        # إزالة الفارغ
+        ous_not_null = ous.filtered(lambda x: x)
 
-        # إزالة share_ou
-        invoice_ous = invoice_ous.filtered(lambda x: not x.share_ou)
-        payment_ous = payment_ous.filtered(lambda x: not x.share_ou)
-        refund_ous = refund_ous.filtered(lambda x: not x.share_ou)
-
-        # 🟢 دمج الفاتورة + المرتجع (نفس المعاملة)
-        invoice_and_refund_ous = (invoice_ous | refund_ous)
-
-        # ❌ إذا فيه OU في الفاتورة/المرتجع والدفعة بدون OU
-        if invoice_and_refund_ous and not payment_ous:
-            # 👈 اسمح لو العملية فقط بين فاتورة ومرتجع
-            if not refund_ous:
-                raise ValidationError(
-                    'Payment has no Operation Unit while Invoice has one.'
-                )
-
-        # ❌ إذا فيه دفعة فيها OU والفاتورة/المرتجع بدون
-        if payment_ous and not invoice_and_refund_ous:
+        # 🔴 إذا في OU فاضي مع OU موجود → منع
+        if ous_not_null and len(ous_not_null) != len(moves):
             raise ValidationError(
-                'Invoice has no Operation Unit while Payment has one.'
+                'All entries must have an Operation Unit.'
             )
 
-        # ❌ اختلاف OU بين الفاتورة/المرتجع والدفعه
-        if invoice_and_refund_ous and payment_ous:
-            if invoice_and_refund_ous != payment_ous:
+        # 🟢 حالة خاصة: فاتورة + مرتجع فقط
+        if invoices and refunds and not payments:
+            # لازم نفس OU
+            if len(ous_not_null) > 1:
                 raise ValidationError(
-                    'Invoice and Payment must belong to the same Operation Unit.'
+                    'Invoice and Refund must have the same Operation Unit.'
                 )
+            return super().reconcile()
 
-    return super().reconcile()
+        # 🟢 إذا كلها نفس OU → عادي
+        if len(ous_not_null) <= 1:
+            return super().reconcile()
+
+        # 🟢 إذا فيه OU فيها share_ou → نسمح
+        if any(ou.share_ou for ou in ous_not_null):
+            return super().reconcile()
+
+        # ❌ غير ذلك → منع
+        raise ValidationError(
+            'You cannot reconcile entries from different Operation Units unless one of them is shared.'
+        )
 
     # def reconcile(self):
     #     for rec in self:
