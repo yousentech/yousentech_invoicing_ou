@@ -9,20 +9,24 @@
 			<field name="category_id" ref="yousentech_invoicing.invoice_category"/>
 		</record>
 
+		<!--
+			Record Rules were intentionally disabled for the live customer.
+			OU filtering is now applied at action/menu level from models/ir_actions.py.
+			Keeping the same XML IDs with active=False ensures existing rules are disabled
+			during module upgrade without deleting historical XML IDs.
+		-->
 		<record id="rule_account_move_ou" model="ir.rule">
-			<field name="name">account move OU Rule</field>
+			<field name="name">account move OU Rule - disabled</field>
 			<field name="model_id" ref="account.model_account_move"/>
-			<field name="domain_force">
-				['|',('operation_unit_id','=', False),('operation_unit_id', 'in', user.ou_config_ids.allowed_ou_ids.ids)]
-			</field>
+			<field name="domain_force">[(1, '=', 1)]</field>
+			<field name="active" eval="False"/>
 		</record>
 
 		<record id="rule_account_payment_ou" model="ir.rule">
-			<field name="name">account_payment OU Rule</field>
+			<field name="name">account_payment OU Rule - disabled</field>
 			<field name="model_id" ref="account.model_account_payment"/>
-			<field name="domain_force">
-				['|',('operation_unit_id','=', False),('operation_unit_id', 'in', user.ou_config_ids.allowed_ou_ids.ids)]
-			</field>
+			<field name="domain_force">[(1, '=', 1)]</field>
+			<field name="active" eval="False"/>
 		</record>
 
     </data>
