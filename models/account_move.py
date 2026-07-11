@@ -83,11 +83,12 @@ class AccountMove(models.Model):
     def create(self, vals):
        
         if not vals.get('operation_unit_id'):
+            company = vals.get('company_id', self.env.company.id)
             
-            vals['operation_unit_id'] =  self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == vals.get('company_id')).default_ou_id.id
+            vals['operation_unit_id'] =  self.env.user.ou_config_ids.filtered(lambda x: x.company_id.id == company).default_ou_id.id
         
         res= super().create(vals)
-        self._check_operation_unit_validity()
+        res._check_operation_unit_validity()
         return res
    
     # def write(self, vals):
@@ -303,38 +304,98 @@ class AccountMoveLine(models.Model):
         copy=False
     )
     
-    def reconcile(self):
-        for rec in self:
-            moves = self.mapped('move_id')
+    # def reconcile(self):
+    #     for rec in self:
+    #         moves = self.mapped('move_id')
 
-            invoice_ous = moves.filtered(
-                lambda m: m.move_type in ['out_invoice', 'in_invoice']
-            ).mapped('operation_unit_id')
+    #         invoice_ous = moves.filtered(
+    #             lambda m: m.move_type in ['out_invoice', 'in_invoice']
+    #         ).mapped('operation_unit_id')
 
-            payment_ous = moves.filtered(
-                lambda m: m.payment_id
-            ).mapped('operation_unit_id') 
+    #         payment_ous = moves.filtered(
+    #             lambda m: m.payment_id
+    #         ).mapped('operation_unit_id') 
             
-            refund_ous = moves.filtered(
-                lambda m: m.move_type in ['out_refund', 'in_refund']
-            ).mapped('operation_unit_id')
-            if invoice_ous and not (payment_ous or refund_ous):
-                raise ValidationError(
-                    'Payment has no Operation Unit while Invoice has one.'
-                )
+    #         refund_ous = moves.filtered(
+    #             lambda m: m.move_type in ['out_refund', 'in_refund']
+    #         ).mapped('operation_unit_id')
+    #         if invoice_ous and not (payment_ous or refund_ous):
+    #             raise ValidationError(
+    #                 'Payment has no Operation Unit while Invoice has one.'
+    #             )
  
-            if (payment_ous or refund_ous) and not invoice_ous:
-                raise ValidationError(
-                    'Invoice has no Operation Unit while Payment has one.'
-                )
+    #         if (payment_ous or refund_ous) and not invoice_ous:
+    #             raise ValidationError(
+    #                 'Invoice has no Operation Unit while Payment has one.'
+    #             )
  
-            if invoice_ous and (payment_ous or refund_ous) and invoice_ous != (payment_ous or refund_ous) and not payment_ous.share_ou :
-                raise ValidationError(
-                    'Invoice and Payment must belong to the same Operation Unit.'
-                )
- 
+    #         counterpart_ous = payment_ous or refund_ous
+
+    #         if (
+    #             invoice_ous
+    #             and counterpart_ous
+    #             and invoice_ous.ids != counterpart_ous.ids
+    #             and not counterpart_ous.filtered(lambda ou: ou.share_ou)):
+
+    #             raise ValidationError(
+    #                 _('Invoice and Payment must belong to the same Operation Unit.')
+    #             )
+
                 
+        # return super().reconcile()
+
+
+    def reconcile(self):
+        # جميع القيود المشاركة في التسوية
+        moves = self.mapped("move_id")
+
+        # الفواتير والإشعارات الدائنة/المدينة
+        invoice_moves = moves.filtered(
+            lambda m: m.move_type in (
+                "out_invoice",
+                "in_invoice",
+                "out_refund",
+                "in_refund",
+            )
+        )
+
+        # إذا لم توجد فاتورة فلا يوجد أي تحقق إضافي
+        if invoice_moves:
+
+            invoice_ous = invoice_moves.mapped("operation_unit_id")
+
+            # يجب أن تكون جميع الفواتير من نفس OU
+            if len(invoice_ous) > 1:
+                raise ValidationError(
+                    _("Invoices in the same reconciliation must belong to the same Operation Unit.")
+                )
+
+            invoice_ou = invoice_ous[:1]
+
+            # جميع القيود الأخرى (دفعات + قيود يومية + غيرها)
+            counterpart_moves = moves - invoice_moves
+
+            for move in counterpart_moves:
+
+                # إذا لم يكن للقيد OU
+                if not move.operation_unit_id:
+                    raise ValidationError(
+                        _("The reconciliation entry must have an Operation Unit.")
+                    )
+
+                # Share OU يسمح بالتسوية مع الجميع
+                if move.operation_unit_id.share_ou:
+                    continue
+
+                # يجب أن يكون مطابقاً للفاتورة
+                if move.operation_unit_id != invoice_ou:
+                    raise ValidationError(
+                        _("The Operation Unit of the reconciliation entry must match the invoice.")
+                    )
+
         return super().reconcile()
+
+        
 class AccountMoveReversal(models.TransientModel):
     _inherit = 'account.move.reversal'
 
